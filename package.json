@@ -1,0 +1,21 @@
+{
+  "name": "student_attendance",
+  "version": "1.0.0",
+  "description": "A webisite for teachers to mark student attendance",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "Student",
+    "Attendance"
+  ],
+  "author": "Pankaj Jagadale",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "mariadb": "^3.4.5",
+    "path": "^0.12.7"
+  }
+}
