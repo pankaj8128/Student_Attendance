@@ -1,5 +1,5 @@
 const express = require('express')
-const pool = require('./db')
+const pool = require('../db')
 
 const app = express();
 const router = express.Router();
@@ -19,6 +19,25 @@ router.get('/:id', async (req, res) => {
         if(conn)
             conn.release();
     }   
+});
+
+
+router.post('/', async (req, res) => {
+    const {id, name, contact} = req.body;
+    let conn;
+    try{
+        conn = pool.getConnection();
+        const rows = conn.query('insert into student values (?, ?, ?)', [id, name, contact]);
+        conn.release();
+        rows? res.send('Student inserted'):res.send('Unable to insert student');
+    } 
+    catch (err) {
+        console.log('Error: ', err);
+    }
+    finally{
+        if(conn)
+            conn.release()
+    }
 });
 
 router.delete('/:id', async (req, res) => {

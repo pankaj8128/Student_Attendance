@@ -2,13 +2,13 @@ const express = require('express')
 const path = require('path')
 const mariadb = require('mariadb')
 const pool = require('./db')
-const router = require('./router')
+const student_router = require('./routers/student')
 require('dotenv').config()
 
 const port = process.env.port;
 const app = express()
 
-app.use('/student', router);
+app.use('/student', student_router);
 
 app.get('/', (req, res) => {
     console.log(`Response detected: ${new Date(Date.now())}`);
