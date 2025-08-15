@@ -3,6 +3,7 @@ const pool = require('../db')
 
 const app = express();
 const router = express.Router();
+app.use(express.json());
 
 router.get('/:id', async (req, res) => {
     const id = req.params.id; 
@@ -26,9 +27,8 @@ router.post('/', async (req, res) => {
     const {id, name, contact} = req.body;
     let conn;
     try{
-        conn = pool.getConnection();
-        const rows = conn.query('insert into student values (?, ?, ?)', [id, name, contact]);
-        conn.release();
+        conn = await pool.getConnection();
+        const rows = await conn.query('insert into student values (?, ?, ?)', [id, name, contact]);
         rows? res.send('Student inserted'):res.send('Unable to insert student');
     } 
     catch (err) {
@@ -45,9 +45,9 @@ router.delete('/:id', async (req, res) => {
     let conn;
     try{
         conn = await pool.getConnection();
-        const rows1 = conn.query('delete from student where id = ?', [id]);
-        const rows2 = conn.query('delete from attendence_table where id = ?', [id]);
-        (rows1 && rows2)? res.send('Successful'):res.send('Unsuccessful');
+        const rows2 = await conn.query('delete from attendance_table where id = ?', [id]);
+        const rows1 = await conn.query('delete from student where id = ?', [id]);
+        (rows1 || rows2)? res.send('Successful'):res.send('Unsuccessful');
     }
     catch (err) {
         console.log("Error: ", err);
