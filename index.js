@@ -8,6 +8,7 @@ require('dotenv').config()
 const port = process.env.port;
 const app = express()
 app.use(express.json());
+app.set('view engine', 'ejs')
 
 app.use('/student', student_router);
 

@@ -4,7 +4,7 @@
   "description": "A webisite for teachers to mark student attendance",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "nodemon index.js"
   },
   "keywords": [
     "Student",
@@ -14,8 +14,10 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^17.2.1",
+    "ejs": "^3.1.10",
     "express": "^5.1.0",
     "mariadb": "^3.4.5",
+    "nodemon": "^3.1.10",
     "path": "^0.12.7"
   }
 }
