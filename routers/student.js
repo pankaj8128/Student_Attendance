@@ -15,6 +15,7 @@ router.get('/:id', async (req, res) => {
     }  
     catch (err) {
         console.log('Error: ', err);
+        res.send(`Error: ${err}`);
     }
     finally {
         if(conn)

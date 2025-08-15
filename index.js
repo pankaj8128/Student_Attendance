@@ -25,6 +25,7 @@ app.get('/students', async (req, res) => {
     }
     catch (err) {
         console.log(err);
+        res.send(`Error: ${err}`);
     }
     finally {
         if(conn)
