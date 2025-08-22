@@ -18,6 +18,6 @@ CREATE TABLE IF NOT EXISTS attendance_table (
     id INT(11) NOT NULL,
     attendance ENUM('P','A') DEFAULT 'A',
     PRIMARY KEY (date, id),
-    FOREIGN KEY (id) REFERENCES student(id),
-    FOREIGN KEY (date) REFERENCES topic(date)
+    FOREIGN KEY (id) REFERENCES student(id) ON DELETE CASCADE,
+    FOREIGN KEY (date) REFERENCES topic(date) ON DELETE CASCADE
 );

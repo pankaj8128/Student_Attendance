@@ -64,9 +64,8 @@ router.delete('/:id', async (req, res) => {
     let conn;
     try{
         conn = await pool.getConnection();
-        const rows2 = await conn.query('delete from attendance_table where id = ?', [id]);
-        const rows1 = await conn.query('delete from student where id = ?', [id]);
-        (rows1 || rows2)? res.send('Student deleted'):res.send('Deletion failed');
+        const rows = await conn.query('delete from student where id = ?', [id]);
+        rows? res.send('Student deleted'):res.send('Deletion failed');
     }
     catch (err) {
         res.render('error', {err});
