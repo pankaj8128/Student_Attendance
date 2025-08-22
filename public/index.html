@@ -7,5 +7,22 @@
 </head>
 <body style="background-color: black; color: white">
     <h1>Hi Students</h1>
+    <button onclick="getStudents()">Get Students</button><br>
+    <script>
+        const server = 'http://localhost:3000';
+        async function getStudents(){
+            let link = server + '/students';
+            const response = await fetch(link);
+            const students = await response.json(); 
+            students.forEach((student) => {
+                let el = document.createElement('a');
+                el.setAttribute('href', `student/${student.id}`);
+                el.textContent = student.first_name + ' ' + student.last_name;
+                el.style.color = 'white';
+                document.body.appendChild(el); 
+                document.body.appendChild(document.createElement('br'));
+            });
+        }
+    </script>
 </body>
 </html>
