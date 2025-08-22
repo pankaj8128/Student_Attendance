@@ -11,12 +11,12 @@ router.get('/:id', async (req, res) => {
     let conn;
     try{
         conn = await pool.getConnection();
-        const row = await conn.query('select s.name, at.date, at.attendance from attendance_table at join student s on at.id = s.id where s.id = ?', [id]);
-        res.render('student_profile', { name: row[0].name });
+        const student = await conn.query('select * from student where id = ?', [id]);
+        const attend = await conn.query("select ((select count(*) from attendance_table where id = ? and attendance = 'P') / (select count(*) from attendance_table where id = ?)) * 100 as total_attendance", [id, id]);
+        res.render('student_profile', { name: student[0].first_name, attendance: attend[0].total_attendance });
     }  
     catch (err) {
-        console.log('Error: ', err);
-        res.send(`Error: ${err}`);
+        res.render('error', {err});
     }
     finally {
         if(conn)
@@ -26,19 +26,36 @@ router.get('/:id', async (req, res) => {
 
 
 router.post('/', async (req, res) => {
-    const {id, name, contact} = req.body;
+    const {id, first_name, last_name, contact} = req.body;
     let conn;
     try{
         conn = await pool.getConnection();
-        const rows = await conn.query('insert into student values (?, ?, ?)', [id, name, contact]);
-        rows? res.send('Student inserted'):res.send('Unable to insert student');
+        const rows = await conn.query('insert into student values (?, ?, ?, ?)', [id, first_name, last_name, contact]);
+        rows? res.send('Student inserted'):res.send('Insertion failed');
     } 
     catch (err) {
-        console.log('Error: ', err);
+        res.render('error', {err});
     }
-    finally{
+    finally {
         if(conn)
-            conn.release()
+            conn.release();
+    }
+});
+
+router.put('/', async (req, res) => {
+    const {id, first_name, last_name, contact} = req.body;
+    let conn;
+    try{
+        conn = await pool.getConnection();
+        const rows = await conn.query('update student set first_name = ?, last_name = ?, contact = ? where id = ?', [first_name, last_name, contact, id]);
+        rows? res.send('Student updated'):res.send('Updation failed');
+    }
+    catch (err) {
+        res.render('error', {err});
+    }
+    finally {
+        if(conn)
+            conn.release();
     }
 });
 
@@ -49,10 +66,10 @@ router.delete('/:id', async (req, res) => {
         conn = await pool.getConnection();
         const rows2 = await conn.query('delete from attendance_table where id = ?', [id]);
         const rows1 = await conn.query('delete from student where id = ?', [id]);
-        (rows1 || rows2)? res.send('Successful'):res.send('Unsuccessful');
+        (rows1 || rows2)? res.send('Student deleted'):res.send('Deletion failed');
     }
     catch (err) {
-        console.log("Error: ", err);
+        res.render('error', {err});
     }
     finally {
         if(conn)

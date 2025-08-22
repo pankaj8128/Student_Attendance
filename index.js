@@ -11,6 +11,7 @@ app.use(express.json());
 app.set('view engine', 'ejs')
 
 app.use('/student', student_router);
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
     console.log(`Response detected: ${new Date(Date.now())}`);
@@ -26,7 +27,7 @@ app.get('/students', async (req, res) => {
     }
     catch (err) {
         console.log(err);
-        res.send(`Error: ${err}`);
+        res.render('error', {err});
     }
     finally {
         if(conn)
