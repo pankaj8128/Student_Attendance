@@ -1,28 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Database</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Database</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #f5f5f5;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #4CAF50;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .student-list {
+      margin-top: 30px;
+    }
+
+    .student-list a {
+      display: block;
+      margin: 8px auto;
+      padding: 10px;
+      width: 200px;
+      background-color: #1e1e1e;
+      color: #f5f5f5;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: 0.3s;
+    }
+
+    .student-list a:hover {
+      background-color: #333;
+      color: #4CAF50;
+    }
+  </style>
 </head>
-<body style="background-color: black; color: white">
-    <h1>Hi Students</h1>
-    <button onclick="getStudents()">Get Students</button><br>
-    <script>
-        const server = 'http://localhost:3000';
-        async function getStudents(){
-            let link = server + '/students';
-            const response = await fetch(link);
-            const students = await response.json(); 
-            students.forEach((student) => {
-                let el = document.createElement('a');
-                el.setAttribute('href', `student/${student.id}`);
-                el.textContent = student.first_name + ' ' + student.last_name;
-                el.style.color = 'white';
-                document.body.appendChild(el); 
-                document.body.appendChild(document.createElement('br'));
-            });
-        }
-    </script>
+<body>
+  <h1>Hi Students</h1>
+  <button onclick="getStudents()">Get Students</button>
+
+  <div class="student-list" id="studentList"></div>
+
+  <script>
+    const server = 'http://localhost:3000';
+
+    async function getStudents(){
+      let link = server + '/students';
+      const response = await fetch(link);
+      const students = await response.json(); 
+      
+      const list = document.getElementById('studentList');
+      list.innerHTML = ''; // clear previous list
+
+      students.forEach((student) => {
+        let el = document.createElement('a');
+        el.setAttribute('href', `student/${student.id}`);
+        el.textContent = student.first_name + ' ' + student.last_name;
+        list.appendChild(el); 
+      });
+    }
+  </script>
 </body>
 </html>
