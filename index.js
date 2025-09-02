@@ -8,6 +8,10 @@ require('dotenv').config()
 const port = process.env.port;
 const app = express()
 app.use(express.json());
+
+const cookieParser = require('cookie-parser')
+app.use(cookieParser());
+
 app.set('view engine', 'ejs')
 
 app.use('/student', student_router);
@@ -27,7 +31,6 @@ app.post('/login', async (req, res) => {
     try {
         conn = await pool.getConnection();
         const teacher = await conn.query('select id, password from teachers where id = ? and password = ?', [id, password]);
-        console.log(teacher);
         if(teacher.length == 1) {
             res.cookie('id', id);
             res.redirect('/index.html');
@@ -46,6 +49,13 @@ app.post('/login', async (req, res) => {
 });
 
 app.get('/students', async (req, res) => {
+
+    console.log('Cookies: ', req.cookies);
+    if(req.cookies.id === undefined){
+        res.redirect('/login.html');
+        return;
+    }
+
     let conn;
     try {
         conn = await pool.getConnection();

@@ -12,6 +12,10 @@ router.get('/:id', async (req, res) => {
     try{
         conn = await pool.getConnection();
         const student = await conn.query('select * from student where id = ?', [id]);
+        if(!student.length){
+            res.render('error', {err: 'Unknown ID'});
+            return;
+        }
         const attend = await conn.query("select ((select count(*) from attendance_table where id = ? and attendance = 'P') / (select count(*) from attendance_table where id = ?)) * 100 as total_attendance", [id, id]);
         res.render('student_profile', { name: student[0].first_name, attendance: attend[0].total_attendance });
     }  
