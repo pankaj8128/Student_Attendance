@@ -21,3 +21,11 @@ CREATE TABLE IF NOT EXISTS attendance_table (
     FOREIGN KEY (id) REFERENCES student(id) ON DELETE CASCADE,
     FOREIGN KEY (date) REFERENCES topic(date) ON DELETE CASCADE
 );
+
+CREATE TABLE teachers (
+    id INT(11) NOT NULL PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    contact TEXT NOT NULL,
+    password VARCHAR(20) NOT NULL
+);
