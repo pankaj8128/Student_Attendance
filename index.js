@@ -20,6 +20,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
     console.log(`Response detected: ${new Date(Date.now())}`);
+    if(req.cookies.id){
+        res.redirect('/index.html');
+        return;
+    }
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
@@ -52,7 +56,7 @@ app.get('/students', async (req, res) => {
 
     console.log('Cookies: ', req.cookies);
     if(req.cookies.id === undefined){
-        res.redirect('/login.html');
+        res.sendFile(path.join(__dirname, 'public', 'login.html'));
         return;
     }
 
