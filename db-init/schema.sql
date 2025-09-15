@@ -1,31 +1,43 @@
-CREATE DATABASE IF NOT EXISTS students;
-USE students;
+-- Database
+CREATE DATABASE IF NOT EXISTS attendance_system;
+USE attendance_system;
 
-CREATE TABLE IF NOT EXISTS student (
-    id INT(11) NOT NULL PRIMARY KEY,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    contact TEXT
+-- Teachers Table
+CREATE TABLE IF NOT EXISTS teachers (
+    teacher_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS topic (
-    date DATE NOT NULL PRIMARY KEY DEFAULT (CURDATE()),
-    topics_covered VARCHAR(250)
+-- Students Table (Composite PK: teacher_id + student_id)
+CREATE TABLE IF NOT EXISTS students (
+    teacher_id INT NOT NULL,
+    student_id INT NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (teacher_id, student_id),
+    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS attendance_table (
-    date DATE NOT NULL DEFAULT (CURDATE()),
-    id INT(11) NOT NULL,
-    attendance ENUM('P','A') DEFAULT 'A',
-    PRIMARY KEY (date, id),
-    FOREIGN KEY (id) REFERENCES student(id) ON DELETE CASCADE,
-    FOREIGN KEY (date) REFERENCES topic(date) ON DELETE CASCADE
+-- Topics Table (Composite PK: teacher_id + date)
+CREATE TABLE IF NOT EXISTS topics (
+    teacher_id INT NOT NULL,
+    `date` DATE NOT NULL DEFAULT (CURDATE()),
+    topic VARCHAR(255) NOT NULL,
+    PRIMARY KEY (teacher_id, `date`),
+    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE CASCADE
 );
 
-CREATE TABLE teachers (
-    id INT(11) NOT NULL PRIMARY KEY,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    contact TEXT NOT NULL,
-    password VARCHAR(20) NOT NULL
+-- Attendance Table (Composite PK: teacher_id + student_id + date)
+CREATE TABLE IF NOT EXISTS attendance (
+    teacher_id INT NOT NULL,
+    student_id INT NOT NULL,
+    `date` DATE NOT NULL,
+    status ENUM('Present', 'Absent') NOT NULL DEFAULT 'Present',
+    PRIMARY KEY (teacher_id, student_id, `date`),
+    FOREIGN KEY (teacher_id, student_id) 
+        REFERENCES students(teacher_id, student_id) 
+        ON DELETE CASCADE,
+    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE CASCADE
 );

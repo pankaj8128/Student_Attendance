@@ -11,13 +11,13 @@ router.get('/:id', async (req, res) => {
     let conn;
     try{
         conn = await pool.getConnection();
-        const student = await conn.query('select * from student where id = ?', [id]);
+        const student = await conn.query('SELECT student_id, first_name, last_name FROM students WHERE teacher_id = ? AND student_id = ?', [req.cookies.id, id]);
         if(!student.length){
             res.render('error', {err: 'Unknown ID'});
             return;
         }
-        const attend = await conn.query("select ((select count(*) from attendance_table where id = ? and attendance = 'P') / (select count(*) from attendance_table where id = ?)) * 100 as total_attendance", [id, id]);
-        res.render('student_profile', { name: student[0].first_name, attendance: attend[0].total_attendance });
+        const attendance = await conn.query("SELECT ((SELECT COUNT(*) FROM attendance WHERE teacher_id = ? AND student_id = ? AND status = 'Present') / (SELECT COUNT(*) FROM attendance WHERE teacher_id = ? AND student_id = ?)) * 100 as total_attendance", [req.cookies.id, id, req.cookies.id, id]);
+        res.render('student_profile', { name: student[0].first_name, attendance: attendance[0].total_attendance });
     }  
     catch (err) {
         res.render('error', {err});
@@ -30,11 +30,11 @@ router.get('/:id', async (req, res) => {
 
 
 router.post('/', async (req, res) => {
-    const {id, first_name, last_name, contact} = req.body;
+    const {id, first_name, last_name} = req.body;
     let conn;
     try{
         conn = await pool.getConnection();
-        const rows = await conn.query('insert into student values (?, ?, ?, ?)', [id, first_name, last_name, contact]);
+        const rows = await conn.query('INSERT INTO students values (?, ?, ?, ?)', [req.cookies.id, id, first_name, last_name]);
         rows? res.send('Student inserted'):res.send('Insertion failed');
     } 
     catch (err) {
@@ -47,11 +47,11 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/', async (req, res) => {
-    const {id, first_name, last_name, contact} = req.body;
+    const {id, first_name, last_name} = req.body;
     let conn;
     try{
         conn = await pool.getConnection();
-        const rows = await conn.query('update student set first_name = ?, last_name = ?, contact = ? where id = ?', [first_name, last_name, contact, id]);
+        const rows = await conn.query('UPDATE students SET first_name = ?, last_name = ? WHERE teacher_id = ? AND student_id = ?', [first_name, last_name, req.cookies.id, id]);
         rows? res.send('Student updated'):res.send('Updation failed');
     }
     catch (err) {
@@ -68,7 +68,7 @@ router.delete('/:id', async (req, res) => {
     let conn;
     try{
         conn = await pool.getConnection();
-        const rows = await conn.query('delete from student where id = ?', [id]);
+        const rows = await conn.query('DELETE FROM students WHERE teacher_id = ? AND student_id = ?', [req.cookies.id, id]);
         rows? res.send('Student deleted'):res.send('Deletion failed');
     }
     catch (err) {

@@ -2,7 +2,8 @@ const express = require('express')
 const path = require('path')
 const mariadb = require('mariadb')
 const pool = require('./db')
-const student_router = require('./routers/student')
+const student_route = require('./routes/student')
+const bcrypt = require('bcrypt')
 require('dotenv').config()
 
 const port = process.env.port;
@@ -14,7 +15,7 @@ app.use(cookieParser());
 
 app.set('view engine', 'ejs')
 
-app.use('/student', student_router);
+app.use('/student', student_route);
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -30,12 +31,12 @@ app.get('/', (req, res) => {
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/login', async (req, res) => {
-    const { id, password } = req.body;
+    const {id, password} = req.body;
     let conn;
     try {
         conn = await pool.getConnection();
-        const teacher = await conn.query('select id, password from teachers where id = ? and password = ?', [id, password]);
-        if(teacher.length == 1) {
+        const teacher = await conn.query('SELECT * FROM teachers WHERE teacher_id = ?', [id]);
+        if(await bcrypt.compare(password, teacher[0].password)) {
             res.cookie('id', id);
             res.redirect('/index.html');
         } else {
@@ -62,7 +63,7 @@ app.get('/students', async (req, res) => {
     let conn;
     try {
         conn = await pool.getConnection();
-        const rows = await conn.query('select * from student');
+        const rows = await conn.query('SELECT student_id, first_name, last_name FROM students WHERE teacher_id = ?', [req.cookies.id]);
         res.json(rows);
     }
     catch (err) {

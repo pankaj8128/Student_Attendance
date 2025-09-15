@@ -12,7 +12,7 @@
       margin: 0;
       padding: 20px;
       display: flex;
-      justify-content: space-between; /* split left + right */
+      justify-content: space-between;
     }
 
     .left-section {
@@ -26,8 +26,7 @@
       border-radius: 8px;
     }
 
-    h1 {
-      margin-bottom: 20px;
+    h1, h2 {
       color: #4CAF50;
       text-align: center;
     }
@@ -46,6 +45,14 @@
 
     button:hover {
       background-color: #45a049;
+    }
+
+    .logout-btn {
+      background-color: #e53935;
+      margin-bottom: 20px;
+    }
+    .logout-btn:hover {
+      background-color: #c62828;
     }
 
     .student-list {
@@ -95,43 +102,74 @@
       outline: none;
       border: 1px solid #4CAF50;
     }
+
+    .form-section {
+      margin-bottom: 40px;
+    }
   </style>
 </head>
 <body>
   <!-- LEFT SIDE -->
   <div class="left-section">
-    <h1>Hi Teacher</h1>
-    <button onclick="getStudents()">Get Students</button>
+    <!-- Logout Button -->
+    <button class="logout-btn" onclick="logout()">Logout</button>
 
+    <button onclick="getStudents()">Get Students</button>
     <div class="student-list" id="studentList"></div>
   </div>
 
-  <!-- RIGHT SIDE (Add Student Form) -->
+  <!-- RIGHT SIDE -->
   <div class="right-section">
-    <h2>Add Student</h2>
-    <form id="addStudentForm">
-      <div class="form-group">
-        <label for="studentId">ID</label>
-        <input type="text" id="studentId" name="studentId" required>
-      </div>
-      <div class="form-group">
-        <label for="firstName">First Name</label>
-        <input type="text" id="firstName" name="firstName" required>
-      </div>
-      <div class="form-group">
-        <label for="lastName">Last Name</label>
-        <input type="text" id="lastName" name="lastName" required>
-      </div>
-      <div class="form-group">
-        <label for="contact">Contact</label>
-        <input type="text" id="contact" name="contact" required>
-      </div>
-      <button type="submit">Add Student</button>
-    </form>
+    <!-- Add Student Form -->
+    <div class="form-section">
+      <h2>Add Student</h2>
+      <form id="addStudentForm">
+        <div class="form-group">
+          <label for="studentId">ID</label>
+          <input type="text" id="studentId" name="studentId" required>
+        </div>
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" name="firstName" required>
+        </div>
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" name="lastName" required>
+        </div>
+        <button type="submit">Add Student</button>
+      </form>
+    </div>
+
+    <!-- Update Student Form -->
+    <div class="form-section">
+      <h2>Update Student</h2>
+      <form id="updateStudentForm">
+        <div class="form-group">
+          <label for="updateStudentId">ID</label>
+          <input type="text" id="updateStudentId" name="updateStudentId" required>
+        </div>
+        <div class="form-group">
+          <label for="updateFirstName">First Name</label>
+          <input type="text" id="updateFirstName" name="updateFirstName" required>
+        </div>
+        <div class="form-group">
+          <label for="updateLastName">Last Name</label>
+          <input type="text" id="updateLastName" name="updateLastName" required>
+        </div>
+        <button type="submit">Update Student</button>
+      </form>
+    </div>
   </div>
 
   <script>
     const server = 'http://localhost:3000';
+
+    // Logout function
+    function logout(){
+        //issues
+        document.cookie = "id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        getStudents();
+    }
 
     // Get Students (Left Side)
     async function getStudents(){
@@ -144,7 +182,7 @@
 
       students.forEach((student) => {
         let el = document.createElement('a');
-        el.setAttribute('href', `student/${student.id}`);
+        el.setAttribute('href', `student/${student.student_id}`);
         el.textContent = student.first_name + ' ' + student.last_name;
         list.appendChild(el); 
       });
@@ -155,34 +193,61 @@
     addStudentForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Collect values
       const id = document.getElementById('studentId').value.trim();
       const first_name = document.getElementById('firstName').value.trim();
       const last_name = document.getElementById('lastName').value.trim();
-      const contact = document.getElementById('contact').value.trim();
 
-      if(!id || !first_name || !last_name || !contact){
+      if(!id || !first_name || !last_name){
         alert('All fields are required!');
         return;
       }
 
-      // Send POST request to server
       const response = await fetch(server + '/student', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id, first_name, last_name, contact })
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id, first_name, last_name})
       });
 
       if(response.ok){
         alert('Student added successfully!');
         addStudentForm.reset();
-        getStudents(); // refresh student list
+        getStudents();
       } else {
         alert('Error adding student!');
+      }
+    });
+
+    // Update Student (Right Side)
+    const updateStudentForm = document.getElementById('updateStudentForm');
+    updateStudentForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById('updateStudentId').value.trim();
+      const first_name = document.getElementById('updateFirstName').value.trim();
+      const last_name = document.getElementById('updateLastName').value.trim();
+
+      if(!id || !first_name || !last_name){
+        alert('All fields are required!');
+        return;
+      }
+
+      // Send PUT request to server
+      const response = await fetch(server + '/student', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id, first_name, last_name})
+      });
+
+      if(response.ok){
+        alert('Student updated successfully!');
+        updateStudentForm.reset();
+        getStudents();
+      } else {
+        alert('Error updating student!');
       }
     });
   </script>
 </body>
 </html>
+
+
