@@ -54,7 +54,6 @@ app.post('/login', async (req, res) => {
 
 app.get('/students', async (req, res) => {
 
-    console.log('Cookies: ', req.cookies);
     if(req.cookies.id === undefined){
         res.sendFile(path.join(__dirname, 'public', 'login.html'));
         return;
@@ -76,5 +75,5 @@ app.get('/students', async (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Listening on port: ${port}`);
+    console.log(`Listening on port: ${port}. Visit: http://localhost:${port}`);
 });
