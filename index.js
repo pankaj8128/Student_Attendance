@@ -22,15 +22,13 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
     console.log(`Response detected: ${new Date(Date.now())}`);
     if(req.cookies.id){
-        res.redirect('/index.html');
+        res.sendFile(path.join(__dirname, 'public', 'index.html'));
         return;
     }
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.post('/login', async (req, res) => {
+app.post('/dashboard', async (req, res) => {
     const {id, password} = req.body;
     let conn;
     try {
@@ -38,7 +36,7 @@ app.post('/login', async (req, res) => {
         const teacher = await conn.query('SELECT * FROM teachers WHERE teacher_id = ?', [id]);
         if(await bcrypt.compare(password, teacher[0].password)) {
             res.cookie('id', id);
-            res.redirect('/index.html');
+            res.sendFile(path.join(__dirname, 'public', 'index.html'));
         } else {
             res.json("Wrong credentials");
         }

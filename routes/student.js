@@ -17,7 +17,7 @@ router.get('/:id', async (req, res) => {
             return;
         }
         const attendance = await conn.query("SELECT ((SELECT COUNT(*) FROM attendance WHERE teacher_id = ? AND student_id = ? AND status = 'Present') / (SELECT COUNT(*) FROM attendance WHERE teacher_id = ? AND student_id = ?)) * 100 as total_attendance", [req.cookies.id, id, req.cookies.id, id]);
-        res.render('student_profile', { name: student[0].first_name, attendance: attendance[0].total_attendance });
+        res.render('student_profile', { name: student[0].first_name + ' ' + student[0].last_name, attendance: Math.ceil(attendance[0].total_attendance) });
     }  
     catch (err) {
         res.render('error', {err});
