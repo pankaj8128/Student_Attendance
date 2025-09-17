@@ -36,6 +36,8 @@ app.post('/dashboard', async (req, res) => {
         const teacher = await conn.query('SELECT * FROM teachers WHERE teacher_id = ?', [id]);
         if(await bcrypt.compare(password, teacher[0].password)) {
             res.cookie('id', id);
+            res.cookie('first_name', teacher[0].first_name);
+            res.cookie('last_name', teacher[0].last_name);
             res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
         } else {
             res.json("Wrong credentials");
