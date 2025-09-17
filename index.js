@@ -48,7 +48,7 @@ app.post('/dashboard', async (req, res) => {
     }
     catch(err) {
         console.log('Error: ', err);
-        res.json({err: err});
+        res.render('error', {err});
     }
     finally {
         if(conn)
@@ -65,7 +65,7 @@ app.post('/attendance', async (req, res) => {
             for(let i = 0; i < req.body.attendance.length; i++) {
                 let status = req.body.attendance[i].status;
                 status = status.charAt(0).toUpperCase() + status.slice(1);
-                await conn.query('UPDATE attendance SET status = ? WHERE teacher_id = ? AND student_id = ?', [status, Number(req.cookies.id), Number(req.body.attendance[i].student_id)]);
+                await conn.query('UPDATE attendance SET status = ? WHERE teacher_id = ? AND student_id = ? AND date = ?', [status, Number(req.cookies.id), Number(req.body.attendance[i].student_id), req.cookies.date]);
             }
             await conn.query('UPDATE topics SET topic = ? WHERE teacher_id = ? AND date = ?',[req.body.topic, Number(req.cookies.id), req.body.date]);
             res.send('Attendance marked');
