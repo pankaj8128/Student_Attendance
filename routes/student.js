@@ -3,6 +3,29 @@ const pool = require('../db');
 const router = express.Router();
 router.use(express.json());
 
+router.get('/', async (req, res) => {
+    if(req.cookies.id === undefined){
+        res.sendFile(path.join(__dirname, 'frontend', 'login.html'));
+        return;
+    }
+
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query('SELECT student_id, first_name, last_name FROM students WHERE teacher_id = ?', [req.cookies.id]);
+        res.json(rows);
+    }
+    catch (err) {
+        res.render('error', {err});
+    }
+    finally {
+        if(conn)
+            conn.release();
+    }
+});
+
+
+
 router.get('/:id', async (req, res) => {
     const id = req.params.id; 
     let conn;

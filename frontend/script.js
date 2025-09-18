@@ -27,7 +27,7 @@ function logout() {
 
 // --- Students & Attendance Form ---
 async function markAttendance() {
-  let link = server + '/students';
+  let link = server + '/student';
   const response = await fetch(link);
   const students = await response.json();
 
