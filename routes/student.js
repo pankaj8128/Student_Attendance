@@ -1,10 +1,7 @@
-const express = require('express')
-const pool = require('../db')
-
-const app = express();
+const express = require('express');
+const pool = require('../db');
 const router = express.Router();
-app.use(express.json());
-app.set('view engine', 'ejs');
+router.use(express.json());
 
 router.get('/:id', async (req, res) => {
     const id = req.params.id; 

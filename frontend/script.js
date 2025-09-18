@@ -77,6 +77,9 @@ async function markAttendance() {
     hiddenInput.name = 'student_id';
     hiddenInput.value = student.student_id;
 
+    // absent by default
+    attendance[student.student_id] = 'Absent';
+
     // present button
     let presentBtn = document.createElement('button');
     presentBtn.type = 'button';
@@ -98,6 +101,9 @@ async function markAttendance() {
       absentBtn.style.opacity = '1';
       presentBtn.style.opacity = '0.4';
     };
+
+    absentBtn.style.opacity = '1';
+    presentBtn.style.opacity = '0.4';
 
     row.appendChild(studentIdDiv);
     row.appendChild(name);
