@@ -1,18 +1,23 @@
-const express = require('express')
-const path = require('path')
-const mariadb = require('mariadb')
-const pool = require('./db')
-const student_route = require('./routes/student')
-const bcrypt = require('bcrypt')
-const cookieParser = require('cookie-parser')
-require('dotenv').config()
-const port = process.env.port;
-const app = express()
+const express = require('express');
+const app = express();
 app.use(express.json());
+
+const mariadb = require('mariadb');
+const pool = require('./db');
+require('dotenv').config();
+const port = process.env.port;
+
+const path = require('path');
+const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.set('view engine', 'ejs')
+app.set('view engine', 'ejs');
+
+const student_route = require('./routes/student');
+const attendance_route = require('./routes/attendance');
 app.use('/student', student_route);
+app.use('/attendance', attendance_route);
 
 app.get('/', (req, res) => {
     console.log(`Response detected: ${new Date(Date.now())}`);
@@ -47,7 +52,6 @@ app.post('/dashboard', async (req, res) => {
         }
     }
     catch(err) {
-        console.log('Error: ', err);
         res.render('error', {err});
     }
     finally {
@@ -56,42 +60,7 @@ app.post('/dashboard', async (req, res) => {
     }
 });
 
-app.post('/attendance', async (req, res) => {
-    let conn;
-    try{
-        conn = await pool.getConnection();
-        const rows = await conn.query('SELECT * from attendance WHERE teacher_id = ? AND date = ?', [Number(req.cookies.id), req.body.date]);
-        if(rows.length) {
-            for(let i = 0; i < req.body.attendance.length; i++) {
-                let status = req.body.attendance[i].status;
-                status = status.charAt(0).toUpperCase() + status.slice(1);
-                await conn.query('UPDATE attendance SET status = ? WHERE teacher_id = ? AND student_id = ? AND date = ?', [status, Number(req.cookies.id), Number(req.body.attendance[i].student_id), req.cookies.date]);
-            }
-            await conn.query('UPDATE topics SET topic = ? WHERE teacher_id = ? AND date = ?',[req.body.topic, Number(req.cookies.id), req.body.date]);
-            res.send('Attendance marked');
-        } 
-        else {
-            for(let i = 0; i < req.body.attendance.length; i++) {
-                let status = req.body.attendance[i].status;
-                status = status.charAt(0).toUpperCase() + status.slice(1);
-                await conn.query('INSERT INTO attendance values (?, ?, ?, ?)', [Number(req.cookies.id), Number(req.body.attendance[i].student_id), req.body.date, status]);
-            }
-            await conn.query('INSERT INTO topics values (?, ?, ?)', [Number(req.cookies.id), req.body.date, req.body.topic]);
-            res.send('Attendance marked');
-        } 
-    }
-    catch (err) {
-        console.log(`Error: ${err}`);
-        res.json(err);
-    }
-    finally {
-        if(conn)
-            conn.release();
-    }
-});
-
 app.get('/students', async (req, res) => {
-
     if(req.cookies.id === undefined){
         res.sendFile(path.join(__dirname, 'frontend', 'login.html'));
         return;
