@@ -98,3 +98,29 @@ input.date {
   border: none;
   margin-right: 10px;
 }
+
+.low-attendance-list {
+  margin-top: 20px;
+  overflow-x: auto; 
+}
+
+.low-attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.low-attendance-table th,
+.low-attendance-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.low-attendance-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+thead {
+    display: none;
+}

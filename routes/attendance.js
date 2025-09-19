@@ -3,13 +3,37 @@ const pool = require('../db');
 const router = express.Router();
 router.use(express.json());
 
+router.get('/less', async (req, res) => {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        let students = await conn.query('SELECT student_id, first_name, last_name FROM students WHERE teacher_id = ?', [req.cookies.id]);
+        const answer = [];
+        let attendance;
+        for (const student of students) {
+            attendance = await conn.query("SELECT ((SELECT COUNT(*) FROM attendance WHERE teacher_id = ? AND student_id = ? AND status = 'Present') / (SELECT COUNT(*) FROM attendance WHERE teacher_id = ? AND student_id = ?)) * 100 as total_attendance", [req.cookies.id, student.student_id, req.cookies.id, student.student_id]);
+            if(attendance.length && attendance[0].total_attendance < 75)
+                answer.push({"id": student.student_id, "firstName": student.first_name, "lastName": student.last_name, "attendance": Math.ceil(attendance[0].total_attendance)});
+        }
+        res.json(answer);
+    }
+    catch (err) {
+        res.render('error', {err})
+    }
+    finally {
+        if(conn) 
+            conn.release();
+    }
+});
+
 router.get('/:date', async (req, res) => {
     let conn;
     try {
         conn = await pool.getConnection();
         let students = await conn.query('SELECT student_id, status FROM attendance WHERE teacher_id = ? AND attendance_date= ?', [Number(req.cookies.id), req.params.date]);
-        let [topic] = await conn.query('SELECT topic FROM topics WHERE teacher_id = ? AND topic_date = ?', [Number(req.cookies.id), req.params.date]);
-        res.json({"date": req.params.date, "topic": topic.topic, students});
+        let topic = await conn.query('SELECT topic FROM topics WHERE teacher_id = ? AND topic_date = ?', [Number(req.cookies.id), req.params.date]);
+        topic.length? topic = topic[0].topic:topic = '';
+        res.json({"date": req.params.date, topic, students});
     }
     catch (e){
         console.log('Error: ', e);

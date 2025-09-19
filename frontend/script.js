@@ -25,14 +25,63 @@ function logout() {
   window.location.href = '/';
 }
 
+function getLowAttendanceStudents() {
+  fetch(server + '/attendance/less') 
+    .then(response => response.json())
+    .then(data => {
+      const container = document.getElementById('lowAttendanceList');
+
+      if (!data || data.length === 0) {
+        container.innerHTML = '<p>No students below 75% attendance.</p>';
+        return;
+      }
+
+      let html = `
+        <h3>Students Below 75% Attendance</h3>
+        <table class="low-attendance-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Attendance (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      data.forEach(student => {
+        html += `
+          <tr>
+            <td>${student.id}</td>
+            <td>${student.firstName} ${student.lastName}</td>
+            <td>${student.attendance}</td>
+          </tr>
+        `;
+      });
+
+      html += `
+          </tbody>
+        </table>
+      `;
+
+      container.innerHTML = html;
+    })
+    .catch(err => {
+      console.error('Error fetching students:', err);
+      document.getElementById('lowAttendanceList').innerHTML =
+        '<p>Error fetching data. Please try again later.</p>';
+    });
+}
+
 // --- Students & Attendance Form ---
 async function markAttendance() {
+  document.getElementById('lowAttendanceList').innerHTML = '';
   let link = server + '/student';
   const response = await fetch(link);
   const students = await response.json();
 
   const form = document.getElementById('attendanceForm');
-  form.innerHTML = ''; 
+  form.innerHTML = '';
 
   let topicContainer = document.createElement('div');
   topicContainer.style.marginBottom = '15px';
@@ -150,7 +199,7 @@ document.getElementById('attendanceForm').addEventListener('submit', async (e) =
 
   if (response.ok) {
     alert('Attendance submitted successfully!');
-    attendance = {}; 
+    attendance = {};
     document.getElementById('attendanceForm').innerHTML = '';
     document.getElementById('topic').value = ''; // clear after submit
   } else {
