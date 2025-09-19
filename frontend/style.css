@@ -1,126 +1,162 @@
+/* General Body Styles */
 body {
-  background-color: #121212;
-  color: #f5f5f5;
-  font-family: Arial, sans-serif;
+  background-color: #f0f0f0; /* Off-white background for high contrast */
+  color: #000000;
+  font-family: 'Courier New', Courier, monospace; /* Classic monospaced font */
   margin: 0;
-  padding: 20px;
+  padding: 24px;
   display: flex;
   justify-content: space-between;
+  gap: 24px;
 }
 
+/* Layout Sections */
 .left-section {
   width: 60%;
 }
 
 .right-section {
   width: 35%;
-  background-color: #1e1e1e;
-  padding: 20px;
-  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-h1,
+/* Form Sections on the Right */
+.form-section {
+  background-color: #ffffff;
+  padding: 24px;
+  border: 3px solid #000000;
+  box-shadow: 8px 8px 0px #000000; /* Hard, offset shadow */
+}
+
 h2 {
-  color: #4CAF50;
-  text-align: center;
-}
-
-button,
-input {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
-  margin-bottom: 10px;
-}
-
-button:hover {
-  background-color: #45a049;
-}
-
-.logout-btn {
-  background-color: #e53935;
+  color: #000000;
+  text-align: left;
+  margin-top: 0;
   margin-bottom: 20px;
+  font-weight: bold;
+  text-transform: uppercase; /* Common brutalist text styling */
+  border-bottom: 3px solid #000000;
+  padding-bottom: 10px;
 }
 
-.logout-btn:hover {
-  background-color: #c62828;
+/* General Button Styles */
+button {
+  color: #000000;
+  padding: 12px 20px;
+  border: 3px solid #000000;
+  border-radius: 0; /* Hard edges */
+  font-size: 16px;
+  font-weight: bold;
+  font-family: 'Courier New', Courier, monospace;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+  margin-bottom: 10px;
+  box-shadow: 4px 4px 0px #000000;
 }
 
+button:active {
+  transform: translate(4px, 4px); /* "Pushed in" effect on click */
+  box-shadow: none;
+}
+
+/* Specific Button Styles */
+button,
+.present-btn {
+  background-color: #ffff00; /* High-contrast yellow */
+}
+
+.logout-btn,
+.absent-btn {
+  background-color: #ff0000; /* Bright, alarming red */
+  color: #ffffff; /* White text for contrast on red */
+}
+
+.teacher {
+  background-color: #0000ff; /* Bright blue */
+  color: #ffffff;
+}
+
+/* Input & Form Group Styles */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+input[type="text"],
+input[type="date"] {
+  width: 100%;
+  padding: 10px;
+  border: 3px solid #000000;
+  border-radius: 0;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 16px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus {
+  outline: 3px solid #ffff00; /* Use accent color for focus outline */
+  outline-offset: 2px;
+}
+
+/* Student List Styles */
 .student-list {
   margin-top: 30px;
-  text-align: center;
 }
 
 .student-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  background-color: #1e1e1e;
-  border-radius: 5px;
+  padding: 12px 15px;
+  background-color: #ffffff;
+  border: 3px solid #000000;
   margin-bottom: 10px;
 }
 
 .student-name {
   flex: 1;
   text-align: left;
-  padding-left: 10px;
+  padding-left: 20px;
+  font-weight: bold;
 }
 
-.present-btn {
-  background-color: #4CAF50;
-  margin-right: 5px;
-}
-
-.absent-btn {
-  background-color: #e53935;
-}
-
-.teacher {
-  background-color: #2196F3;
-  margin-left: 10px;
-}
-
-.teacher:hover {
-  background-color: #1976D2;
-}
-
-input.date {
-  background-color: #2c2c2c;
-  color: #f5f5f5;
-  padding: 8px;
-  border-radius: 4px;
-  border: none;
-  margin-right: 10px;
-}
-
+/* Low Attendance List & Table */
 .low-attendance-list {
   margin-top: 20px;
-  overflow-x: auto; 
+  background-color: #ffffff;
+  padding: 20px;
+  border: 3px solid #000000;
+}
+
+.low-attendance-list h3 {
+  text-transform: uppercase;
 }
 
 .low-attendance-table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 15px;
 }
 
 .low-attendance-table th,
 .low-attendance-table td {
-  border: 1px solid #ccc;
-  padding: 8px;
+  border: 2px solid #000000; /* Strong grid lines */
+  padding: 12px;
   text-align: left;
 }
 
 .low-attendance-table th {
-  background-color: #f2f2f2;
+  background-color: #000000;
+  color: #ffffff;
   font-weight: bold;
-}
-
-thead {
-    display: none;
 }

@@ -3,51 +3,203 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
+  <title>Login / Create Account</title>
   <style>
+    /* Neo-Brutalist Styles */
     body {
       margin: 0;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #2c3e50; 
+      background-color: #f0f0f0;
+      font-family: 'Courier New', Courier, monospace;
     }
-    #login {
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background-color: white;
-      color: #333; 
+
+    .form-container {
+      background-color: #ffffff;
+      padding: 30px;
+      border: 3px solid #000000;
+      box-shadow: 8px 8px 0px #000000; /* Hard, offset shadow */
+      width: 300px;
       text-align: center;
     }
-    #login input, 
-    #login button {
-      display: block;
-      margin: 10px auto;
-      padding: 8px;
-      width: 200px;
-      border: 1px solid #999;
-      border-radius: 4px;
+    
+    .form-container h2 {
+      margin: 0 0 20px 0;
+      text-transform: uppercase;
+      border-bottom: 3px solid black;
+      padding-bottom: 10px;
     }
-    #login button {
-      background-color: #3498db; 
-      color: white;
-      border: none;
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border: 3px solid #000000;
+      border-radius: 0;
+      box-sizing: border-box;
+      margin-bottom: 15px;
+      font-size: 16px;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    
+    input:focus {
+      outline: 3px solid #ffff00;
+      outline-offset: 2px;
+    }
+
+    button {
+      color: #000000;
+      padding: 12px 20px;
+      border: 3px solid #000000;
+      border-radius: 0;
+      font-size: 16px;
+      font-weight: bold;
+      font-family: 'Courier New', Courier, monospace;
       cursor: pointer;
+      transition: all 0.1s ease-in-out;
+      box-shadow: 4px 4px 0px #000000;
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
     }
-    #login button:hover {
-      background-color: #2980b9;    
+
+    button:active {
+      transform: translate(4px, 4px);
+      box-shadow: none;
+    }
+    
+    /* Primary Action Buttons */
+    .btn-primary {
+      background-color: #ffff00; /* High-contrast yellow */
+    }
+
+    /* Secondary Action Buttons */
+    .btn-secondary {
+      background-color: #cccccc; /* Gray */
+    }
+    
+    /* Link to switch forms */
+    .switch-form-link {
+      background: none;
+      border: none;
+      box-shadow: none;
+      text-decoration: underline;
+      cursor: pointer;
+      font-weight: normal;
+      color: #0000ff;
+      padding: 5px;
+    }
+    .switch-form-link:active {
+      transform: none;
+    }
+
+    /* Utility to hide elements */
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div id="login">
+
+  <div id="login-section" class="form-container">
+    <h2>Login</h2>
     <form action="/dashboard" method="POST">
-      <input type="text" id="id" name="id" placeholder="id" required>
-      <input type="password" id="password" name="password" placeholder="password" required>
-      <button type="submit">Login</button>
-    </form>  
+      <input type="text" id="id" name="id" placeholder="ID" required>
+      <input type="password" id="password" name="password" placeholder="Password" required>
+      <button type="submit" class="btn-primary">Login</button>
+    </form>
+    <button id="show-signup" class="switch-form-link">Don't have an account? Create one.</button>
   </div>
+
+  <div id="signup-section" class="form-container hidden">
+    <div id="signup-step-1">
+      <h2>Create Account (1/2)</h2>
+      <form id="step-1-form">
+        <input type="text" id="signup-id" placeholder="Choose an ID" required>
+        <button type="submit" class="btn-primary">Next</button>
+      </form>
+    </div>
+
+    <div id="signup-step-2" class="hidden">
+      <h2>Create Account (2/2)</h2>
+      <form id="step-2-form">
+        <input type="text" id="first-name" placeholder="First Name" required>
+        <input type="text" id="last-name" placeholder="Last Name" required>
+        <input type="password" id="signup-password" placeholder="Password" required>
+        <button type="submit" class="btn-primary">Create Account</button>
+      </form>
+    </div>
+    <button id="show-login" class="switch-form-link">Already have an account? Login.</button>
+  </div>
+
+  <script>
+    // --- DOM Elements ---
+    const loginSection = document.getElementById('login-section');
+    const signupSection = document.getElementById('signup-section');
+    const signupStep1 = document.getElementById('signup-step-1');
+    const signupStep2 = document.getElementById('signup-step-2');
+
+    const showSignupBtn = document.getElementById('show-signup');
+    const showLoginBtn = document.getElementById('show-login');
+
+    const step1Form = document.getElementById('step-1-form');
+    const step2Form = document.getElementById('step-2-form');
+
+    let newAccountId = ''; // Variable to store the ID from step 1
+
+    // --- Event Listeners ---
+
+    // Switch from Login to Signup view
+    showSignupBtn.addEventListener('click', () => {
+      loginSection.classList.add('hidden');
+      signupSection.classList.remove('hidden');
+    });
+
+    // Switch from Signup to Login view
+    showLoginBtn.addEventListener('click', () => {
+      signupSection.classList.add('hidden');
+      loginSection.classList.remove('hidden');
+      
+      // Reset signup form to step 1
+      signupStep1.classList.remove('hidden');
+      signupStep2.classList.add('hidden');
+    });
+
+    // Handle submission of Step 1 (getting the ID)
+    step1Form.addEventListener('submit', (e) => {
+      e.preventDefault(); // Prevent actual form submission
+      const idInput = document.getElementById('signup-id');
+      if (idInput.value.trim()) {
+        newAccountId = idInput.value.trim(); // Store the ID
+        
+        // Move to the next step
+        signupStep1.classList.add('hidden');
+        signupStep2.classList.remove('hidden');
+      }
+    });
+
+    // Handle final account creation submission
+    step2Form.addEventListener('submit', (e) => {
+      e.preventDefault(); // Prevent actual form submission
+
+      // Gather all data
+      const finalUserData = {
+        id: newAccountId,
+        firstName: document.getElementById('first-name').value,
+        lastName: document.getElementById('last-name').value,
+        password: document.getElementById('signup-password').value,
+      };
+
+      // In a real application, you would send this data to a server
+      // For now, we'll just show an alert with the data.
+      alert('Account creation request:\n' + JSON.stringify(finalUserData, null, 2));
+      
+      // For demonstration, we'll switch back to the login screen after "creation"
+      showLoginBtn.click();
+    });
+  </script>
+
 </body>
 </html>

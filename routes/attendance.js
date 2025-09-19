@@ -52,7 +52,7 @@ router.post('/', async (req, res) => {
         // topic
         rows = await conn.query('SELECT * FROM topics WHERE teacher_id = ? AND topic_date = ?', [req.cookies.id, req.body.date]);
         if(rows.length) 
-            await conn.query('UPDATE topics SET topic = ? WHERE teacher_id = ? AND attendance_date = ?',[req.body.topic, Number(req.cookies.id), req.body.date]);
+            await conn.query('UPDATE topics SET topic = ? WHERE teacher_id = ? AND topic_date = ?',[req.body.topic, Number(req.cookies.id), req.body.date]);
         else
             await conn.query('INSERT INTO topics values (?, ?, ?)', [Number(req.cookies.id), req.body.date, req.body.topic]);
 
