@@ -160,3 +160,16 @@ input[type="date"]:focus {
   color: #ffffff;
   font-weight: bold;
 }
+
+/* --- RESPONSIVE STYLES FOR MOBILE --- */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column; /* Stack the left and right sections vertically */
+    padding: 12px;
+  }
+
+  .left-section,
+  .right-section {
+    width: 100%; /* Make each section take up the full screen width */
+  }
+}
