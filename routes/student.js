@@ -5,7 +5,7 @@ router.use(express.json());
 
 router.get('/', async (req, res) => {
     if(req.cookies.id === undefined){
-        res.sendFile(path.join(__dirname, 'frontend', 'login.html'));
+        res.send('Unauthorized');
         return;
     }
 
@@ -27,6 +27,11 @@ router.get('/', async (req, res) => {
 
 
 router.get('/:id', async (req, res) => {
+    if(req.cookies.id === undefined){
+        res.send('Unauthorized');
+        return;
+    }
+
     const id = req.params.id; 
     let conn;
     try{
@@ -50,6 +55,11 @@ router.get('/:id', async (req, res) => {
 
 
 router.post('/', async (req, res) => {
+    if(req.cookies.id === undefined){
+        res.send('Unauthorized');
+        return;
+    }
+
     const {id, first_name, last_name} = req.body;
     let conn;
     try{
@@ -67,6 +77,11 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/', async (req, res) => {
+    if(req.cookies.id === undefined){
+        res.send('Unauthorized');
+        return;
+    }
+
     const {id, first_name, last_name} = req.body;
     let conn;
     try{
@@ -84,6 +99,11 @@ router.put('/', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
+    if(req.cookies.id === undefined){
+        res.send('Unauthorized');
+        return;
+    }
+
     const id = req.params.id;
     let conn;
     try{

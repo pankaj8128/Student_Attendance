@@ -4,6 +4,11 @@ const router = express.Router();
 router.use(express.json());
 
 router.get('/less', async (req, res) => {
+    if(req.cookies.id === undefined){
+        res.send('Unauthorized');
+        return;
+    }
+
     let conn;
     try {
         conn = await pool.getConnection();
@@ -27,6 +32,11 @@ router.get('/less', async (req, res) => {
 });
 
 router.get('/:date', async (req, res) => {
+    if(req.cookies.id === undefined){
+        res.send('Unauthorized');
+        return;
+    }
+
     let conn;
     try {
         conn = await pool.getConnection();
@@ -45,6 +55,11 @@ router.get('/:date', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
+    if(req.cookies.id === undefined){
+        res.send('Unauthorized');
+        return;
+    }
+
     let conn;
     let rows;
     try{
