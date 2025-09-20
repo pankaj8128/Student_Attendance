@@ -1,5 +1,11 @@
 const server = 'http://localhost:3000';
 
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        showNotification(`Your Id is ${getCookie('id')}`);
+    }, 1000);
+});
+
 // --- Set Date Input ---
 document.querySelector('.date').value = new Date().toISOString().split('T')[0];
 document.querySelector('.date').max = new Date().toISOString().split('T')[0];
@@ -24,6 +30,18 @@ function logout() {
   document.cookie = "first_name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   document.cookie = "last_name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   window.location.href = '/';
+}
+
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        if(document.body.contains(notification))
+            document.body.removeChild(notification);
+    }, 2000);
 }
 
 function getLowAttendanceStudents() {
@@ -199,12 +217,12 @@ document.getElementById('attendanceForm').addEventListener('submit', async (e) =
   });
 
   if (response.ok) {
-    alert('Attendance submitted successfully!');
+    showNotification('Attendance submitted successfully!');
     attendance = {};
     document.getElementById('attendanceForm').innerHTML = '';
     document.getElementById('topic').value = ''; // clear after submit
   } else {
-    alert('Error submitting attendance!');
+    showNotification('Error submitting attendance!');
   }
 });
 
@@ -218,7 +236,7 @@ addStudentForm.addEventListener('submit', async (e) => {
   const last_name = document.getElementById('lastName').value.trim();
 
   if (!id || !first_name || !last_name) {
-    alert('All fields are required!');
+    showNotification('All fields are required!');
     return;
   }
 
@@ -229,11 +247,11 @@ addStudentForm.addEventListener('submit', async (e) => {
   });
 
   if (response.ok) {
-    alert('Student added successfully!');
+    showNotification('Student added successfully!');
     addStudentForm.reset();
     markAttendance();
   } else {
-    alert('Error adding student!');
+    showNotification('Error adding student!');
   }
 });
 
@@ -247,7 +265,7 @@ updateStudentForm.addEventListener('submit', async (e) => {
   const last_name = document.getElementById('updateLastName').value.trim();
 
   if (!id || !first_name || !last_name) {
-    alert('All fields are required!');
+    showNotification('All fields are required!');
     return;
   }
 
@@ -258,11 +276,11 @@ updateStudentForm.addEventListener('submit', async (e) => {
   });
 
   if (response.ok) {
-    alert('Student updated successfully!');
+    showNotification('Student updated successfully!');
     updateStudentForm.reset();
     markAttendance();
   } else {
-    alert('Error updating student!');
+    showNotification('Error updating student!');
   }
 });
 
@@ -273,7 +291,7 @@ deleteStudentForm.addEventListener('submit', async (e) => {
 
   const id = document.getElementById('deleteStudentId').value.trim();
   if (!id) {
-    alert('ID is required!');
+    showNotification('ID is required!');
     return;
   }
 
@@ -282,10 +300,10 @@ deleteStudentForm.addEventListener('submit', async (e) => {
   });
 
   if (response.ok) {
-    alert('Student deleted successfully!');
+    showNotification('Student deleted successfully!');
     deleteStudentForm.reset();
     markAttendance();
   } else {
-    alert('Error deleting student!');
+    showNotification('Error deleting student!');
   }
 });

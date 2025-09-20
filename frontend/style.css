@@ -30,6 +30,22 @@ body {
   box-shadow: 8px 8px 0px #000000; /* Hard, offset shadow */
 }
 
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: #00FF00;
+    color: #000;
+    border: 6px solid #000;
+    padding: 15px 20px;
+    font-weight: 800;
+    text-transform: uppercase;
+    box-shadow: 8px 8px 0px #000;
+    transform: rotate(-2deg);
+    animation: slideIn 0.3s ease;
+}
+
 h2 {
   color: #000000;
   text-align: left;
