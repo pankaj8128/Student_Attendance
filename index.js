@@ -21,11 +21,10 @@ app.use('/attendance', attendance_route);
 
 app.get('/', (req, res) => {
     console.log(`Response detected: ${new Date(Date.now())}`);
-    if(req.cookies.id){
-        res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
-        return;
-    }
-    res.sendFile(path.join(__dirname, 'frontend', 'login.html'));
+    if(req.cookies.id)
+        res.redirect('/dashboard');
+    else
+        res.sendFile(path.join(__dirname, 'frontend', 'login.html'));
 });
 
 app.get("/style.css", (req, res) => {
