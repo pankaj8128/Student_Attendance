@@ -12,10 +12,11 @@ function getCookie(name) {
 }
 
 // --- Teacher Name Button ---
+const id = getCookie('id');
 const teacherFirstName = getCookie('first_name');
 const teacherLastName = getCookie('last_name');
 document.getElementById('teacherBtn').textContent =
-  teacherFirstName && teacherLastName ? `${teacherFirstName} ${teacherLastName}` : 'Teacher';
+    id && teacherFirstName && teacherLastName ? `${teacherFirstName} ${teacherLastName} (${id})` : 'Teacher';
 
 // --- Logout Function ---
 function logout() {

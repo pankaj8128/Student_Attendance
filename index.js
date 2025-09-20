@@ -60,6 +60,28 @@ app.post('/dashboard', async (req, res) => {
     }
 });
 
+app.post('/signup', async (req, res) => {
+    let {first_name, last_name, password} = req.body;
+    password = await bcrypt.hash(password, 10);
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        let rows = await conn.query('INSERT INTO teachers (first_name, last_name, password) VALUES (?, ?, ?)', [first_name, last_name, password]);
+        const id = await conn.query('SELECT teacher_id FROM teachers WHERE first_name = ? AND last_name = ? AND password = ?', [first_name, last_name, password]);
+        res.cookie('id', id[0].teacher_id);
+        res.cookie('first_name', first_name);
+        res.cookie('last_name', last_name);
+        res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
+    }
+    catch (err) {
+        res.json({'Error': err});
+    }
+    finally{
+        if(conn)
+            conn.release();
+    }
+});
+
 app.listen(port, () => {
     console.log(`Listening on port: ${port}. Visit: http://localhost:${port}`);
 });
