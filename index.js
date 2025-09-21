@@ -31,15 +31,16 @@ app.get("/style.css", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "style.css"));
 });
 
+
+app.get("/script.js", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "script.js"));
+});
+
 app.get('/dashboard', (req, res) => {
     if(req.cookies.id)
         res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
     else
         res.sendFile(path.join(__dirname, 'frontend', 'login.html'));
-});
-
-app.get("/script.js", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "script.js"));
 });
 
 app.post('/login', async (req, res) => {
@@ -53,7 +54,6 @@ app.post('/login', async (req, res) => {
             res.cookie('first_name', teacher[0].first_name);
             res.cookie('last_name', teacher[0].last_name);
             res.redirect('/dashboard');
-            // res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
         } else {
             res.json("Wrong credentials");
         }
