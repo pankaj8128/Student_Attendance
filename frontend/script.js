@@ -2,6 +2,7 @@ const server = 'http://localhost:3000';
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('lowAttendanceList').style.display = "none";
+    document.getElementById('attendanceData').style.display = "none";
     setTimeout(() => {
         showNotification(`Your Id is ${getCookie('id')}`);
     }, 1000);
@@ -51,6 +52,9 @@ function showNotification(message) {
 }
 
 function getLowAttendanceStudents() {
+  document.getElementById('lowAttendanceList').style.display = "block";
+  document.getElementById('attendanceForm').style.display = "none";
+  document.getElementById('attendanceData').style.display = "none";
   fetch(server + '/attendance/less') 
     .then(response => response.json())
     .then(data => {
@@ -101,7 +105,9 @@ function getLowAttendanceStudents() {
 
 // --- Students & Attendance Form ---
 async function markAttendance() {
+  document.getElementById('attendanceForm').style.display = "block";
   document.getElementById('lowAttendanceList').style.display = "none";
+  document.getElementById('attendanceData').style.display = "none";
   let link = server + '/student';
   const response = await fetch(link);
   const students = await response.json();
@@ -241,6 +247,67 @@ document.getElementById('attendanceForm').addEventListener('submit', async (e) =
     showNotification('Error submitting attendance!');
   }
 });
+
+async function getAttendanceData() {
+  document.getElementById('lowAttendanceList').style.display = "none";
+  document.getElementById('attendanceForm').style.display = "none";
+  const attendanceData = document.getElementById('attendanceData');
+  attendanceData.innerHTML = '';
+  attendanceData.style.display = "block";
+  let data = await fetch(`${server}/attendance/${document.getElementById('date').value}`);
+  data = await data.json();
+
+  if(!data.students.length) {
+    let div = document.createElement('div');
+    div.innerHTML = 'No data available';
+    div.setAttribute('class', 'attendance-data');
+    attendanceData.innerHTML = '';
+    attendanceData.appendChild(div);
+    return;
+  }
+
+  let topic = document.createElement('div');
+  topic.style.marginBottom = '15px';
+  topic.style.textAlign = 'center';
+  topic.id = 'topic';
+
+  let topicInput = document.createElement('input');
+  topicInput.type = 'text';
+  topicInput.id = 'topic';
+  topicInput.name = 'topic';
+  topicInput.value = data.topic;
+  topicInput.style.backgroundColor = '#2c2c2c';
+  topicInput.style.color = '#f5f5f5';
+  topicInput.style.padding = '8px';
+  topicInput.style.borderRadius = '4px';
+  topicInput.style.border = 'none';
+  topicInput.readOnly = true;
+
+  topic.appendChild(topicInput);
+
+  attendanceData.appendChild(topic);
+
+  data.students.forEach((student) => {
+    let row = document.createElement('div');
+    row.classList.add('student-row');
+
+    let studentIdDiv = document.createElement('div');
+    studentIdDiv.style.width = '60px';
+    studentIdDiv.style.textAlign = 'center';
+    studentIdDiv.textContent = student.student_id;
+
+    let attendanceBtn = document.createElement('button');
+    attendanceBtn.textContent = student.status;
+    attendanceBtn.setAttribute('class', student.status.toLowerCase() + '-btn');
+    attendanceBtn.style.opacity = '1';
+
+    row.appendChild(studentIdDiv);
+    row.appendChild(attendanceBtn);
+
+    attendanceData.appendChild(row);
+  });
+
+}
 
 // --- Add Student ---
 const addStudentForm = document.getElementById('addStudentForm');
