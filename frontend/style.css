@@ -58,7 +58,7 @@ h2 {
 }
 
 /* General Button Styles */
-button {
+button, .date {
   color: #000000;
   padding: 12px 20px;
   border: 3px solid #000000;
@@ -89,7 +89,7 @@ button,
   color: #ffffff; /* White text for contrast on red */
 }
 
-.teacher {
+.teacher, .subject {
   background-color: #0000ff; /* Bright blue */
   color: #ffffff;
 }
@@ -124,6 +124,12 @@ input[type="date"]:focus {
   outline-offset: 2px;
 }
 
+input[type="date"] {
+    width: auto;
+    display: inline-block;
+    box-sizing: content-box;
+}
+
 /* Student List Styles */
 .student-list {
   margin-top: 30px;
@@ -147,7 +153,7 @@ input[type="date"]:focus {
 }
 
 /* Low Attendance List & Table */
-.low-attendance-list {
+.low-attendance-list, .no-students {
   margin-top: 20px;
   background-color: #ffffff;
   padding: 20px;

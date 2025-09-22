@@ -1,6 +1,7 @@
 const server = 'http://localhost:3000';
 
 document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('lowAttendanceList').style.display = "none";
     setTimeout(() => {
         showNotification(`Your Id is ${getCookie('id')}`);
     }, 1000);
@@ -14,21 +15,26 @@ document.querySelector('.date').max = new Date().toISOString().split('T')[0];
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
+  if (parts.length === 2) 
+    return parts.pop().split(';').shift().split('%20').join(' ');
 }
 
-// --- Teacher Name Button ---
+// --- Teacher Name Button, subject ---
 const id = getCookie('id');
 const teacherFirstName = getCookie('first_name');
 const teacherLastName = getCookie('last_name');
+const subject = getCookie('subject');
 document.getElementById('teacherBtn').textContent =
     id && teacherFirstName && teacherLastName ? `${teacherFirstName} ${teacherLastName} (${id})` : 'Teacher';
+document.getElementById('subjectBtn').textContent = 
+    id && teacherFirstName && teacherLastName ? `${subject}`: 'Subject';
 
 // --- Logout Function ---
 function logout() {
   document.cookie = "id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   document.cookie = "first_name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   document.cookie = "last_name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  document.cookie = "subject=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   window.location.href = '/';
 }
 
@@ -90,17 +96,27 @@ function getLowAttendanceStudents() {
       document.getElementById('lowAttendanceList').innerHTML =
         '<p>Error fetching data. Please try again later.</p>';
     });
+    document.getElementById('lowAttendanceList').style.display = "block";
 }
 
 // --- Students & Attendance Form ---
 async function markAttendance() {
-  document.getElementById('lowAttendanceList').innerHTML = '';
+  document.getElementById('lowAttendanceList').style.display = "none";
   let link = server + '/student';
   const response = await fetch(link);
   const students = await response.json();
 
   const form = document.getElementById('attendanceForm');
   form.innerHTML = '';
+
+  if(!students.length) {
+    let div = document.createElement('div');
+    div.innerHTML = 'Add students to mark attendance.';
+    div.setAttribute('class', 'no-students');
+    form.innerHTML = '';
+    form.appendChild(div);
+    return;
+  }
 
   let topicContainer = document.createElement('div');
   topicContainer.style.marginBottom = '15px';

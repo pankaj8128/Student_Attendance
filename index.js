@@ -53,6 +53,7 @@ app.post('/login', async (req, res) => {
             res.cookie('id', id);
             res.cookie('first_name', teacher[0].first_name);
             res.cookie('last_name', teacher[0].last_name);
+            res.cookie('subject', teacher[0].subject);
             res.redirect('/dashboard');
         } else {
             res.json("Wrong credentials");
@@ -68,18 +69,18 @@ app.post('/login', async (req, res) => {
 });
 
 app.post('/signup', async (req, res) => {
-    let {first_name, last_name, password} = req.body;
+    let {first_name, last_name,subject, password} = req.body;
     password = await bcrypt.hash(password, 10);
     let conn;
     try {
         conn = await pool.getConnection();
-        let rows = await conn.query('INSERT INTO teachers (first_name, last_name, password) VALUES (?, ?, ?)', [first_name, last_name, password]);
+        let rows = await conn.query('INSERT INTO teachers (first_name, last_name, subject, password) VALUES (?, ?, ?, ?)', [first_name, last_name, subject, password]);
         const id = await conn.query('SELECT teacher_id FROM teachers WHERE first_name = ? AND last_name = ? AND password = ?', [first_name, last_name, password]);
         res.cookie('id', id[0].teacher_id);
         res.cookie('first_name', first_name);
         res.cookie('last_name', last_name);
+        res.cookie('subject', subject);
         res.redirect('/dashboard');
-        // res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
     }
     catch (err) {
         res.json({'Error': err});

@@ -24,8 +24,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-
-
 router.get('/:id', async (req, res) => {
     if(req.cookies.id === undefined){
         res.send('Unauthorized');
