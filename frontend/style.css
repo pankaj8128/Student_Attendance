@@ -78,9 +78,12 @@ button:active {
 }
 
 /* Specific Button Styles */
-button,
-.present-btn {
+button {
   background-color: #ffff00; /* High-contrast yellow */
+}
+
+.present-btn {
+    background-color: #00ff00;
 }
 
 .logout-btn,
