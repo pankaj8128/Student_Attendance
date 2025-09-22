@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS teachers (
     teacher_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
+    subject varchar(100) NOT NULL,
     password VARCHAR(255) NOT NULL
 );
 
