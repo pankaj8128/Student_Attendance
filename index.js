@@ -18,6 +18,7 @@ const student_route = require('./routes/student');
 const attendance_route = require('./routes/attendance');
 app.use('/student', student_route);
 app.use('/attendance', attendance_route);
+const { auth } = require('./middlewares/auth');
 
 app.get('/', (req, res) => {
     console.log(`Response detected: ${new Date(Date.now())}`);
@@ -36,11 +37,8 @@ app.get("/script.js", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "script.js"));
 });
 
-app.get('/dashboard', (req, res) => {
-    if(req.cookies.id)
-        res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
-    else
-        res.sendFile(path.join(__dirname, 'frontend', 'login.html'));
+app.get('/dashboard', auth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
 app.post('/login', async (req, res) => {
