@@ -2,12 +2,11 @@ const pool = require('../db');
 const path = require('path');
 
 exports.auth = async (req, res, next) => {
-    const id = req.cookies.id;
     let conn;
     try {
         conn = await pool.getConnection();
-        let rows = await conn.query('SELECT teacher_id, first_name, last_name FROM teachers where teacher_id = ?', [id]);
-        if(rows.length < 1 || (req.cookies.first_name != rows[0].first_name && req.cookies.last_name != rows[0].last_name)) 
+        const rows = await conn.query('SELECT teacher_id FROM teachers WHERE teacher_id = ? AND first_name = ? AND last_name = ? AND subject = ?', [req.cookies.id, req.cookies.first_name, req.cookies.last_name, req.cookies.subject]);
+        if(rows.length != 1)
             return res.sendFile(path.join(__dirname, '../', 'frontend', 'login.html'));
         next();
     }
