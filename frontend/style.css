@@ -127,7 +127,8 @@ input[type="date"]:focus {
   outline-offset: 2px;
 }
 
-input[type="date"] {
+input[type="date"],
+input[id="id"] {
     width: auto;
     display: inline-block;
     box-sizing: content-box;
@@ -156,7 +157,10 @@ input[type="date"] {
 }
 
 /* Low Attendance List & Table */
-.low-attendance-list, .no-students, .attendanceData {
+.low-attendance-list, 
+.no-students, 
+.attendanceData, 
+.studentAttedanceData{
   margin-top: 20px;
   background-color: #ffffff;
   padding: 20px;
@@ -174,7 +178,7 @@ input[type="date"] {
 }
 
 .low-attendance-table th,
-.low-attendance-table td {
+.low-attendance-table td, td {
   border: 2px solid #000000; /* Strong grid lines */
   padding: 12px;
   text-align: left;

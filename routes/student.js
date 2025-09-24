@@ -27,12 +27,16 @@ router.get('/:id', async (req, res) => {
     try{
         conn = await pool.getConnection();
         const student = await conn.query('SELECT student_id, first_name, last_name FROM students WHERE teacher_id = ? AND student_id = ?', [req.cookies.id, id]);
-        if(!student.length){
-            res.render('error', {err: 'Unknown ID'});
-            return;
-        }
+        if(!student.length)
+            return res.json('Id not found');  
         const attendance = await conn.query("SELECT ((SELECT COUNT(*) FROM attendance WHERE teacher_id = ? AND student_id = ? AND status = 'Present') / (SELECT COUNT(*) FROM attendance WHERE teacher_id = ? AND student_id = ?)) * 100 as total_attendance", [req.cookies.id, id, req.cookies.id, id]);
-        res.render('student_profile', { name: student[0].first_name + ' ' + student[0].last_name, attendance: Math.ceil(attendance[0].total_attendance) });
+        let presentDates = await conn.query("SELECT attendance_date FROM attendance WHERE teacher_id = ? AND student_id = ? AND status = 'Present'", [req.cookies.id, id]);
+        let absentDates = await conn.query("SELECT attendance_date FROM attendance WHERE teacher_id = ? AND student_id = ? AND status = 'Absent'", [req.cookies.id, id]);
+        for(let i = 0; i < presentDates.length; i++)
+            presentDates[i] = presentDates[i].attendance_date;
+        for(let i = 0; i < absentDates.length; i++)
+            absentDates[i] = absentDates[i].attendance_date;
+        res.json({student: student[0], attendance: Math.ceil(attendance[0].total_attendance), presentDates, absentDates});
     }  
     catch (err) {
         res.render('error', {err});

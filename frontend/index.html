@@ -16,8 +16,14 @@
     <button onclick="markAttendance()">Mark Attendance</button>
     <button onclick="getLowAttendanceStudents()">Below 75% Attendance</button>
     <button onclick="getAttendanceData()">Get Attendance Data</button>
+    <button id="student-attendance-btn" class="student-attendance-btn">Student Attendance</button>
     <div id="lowAttendanceList" class="low-attendance-list"></div>
     <div id="attendanceData" class="attendanceData"></div>
+    <div id="studentAttedanceData" class="studentAttedanceData">
+        <input type="text" id="id" class="id" placeholder="Student Id">
+        <button onclick="getStudentAttendance()">Get Data</button>
+        <div id="data" class="data"></div>
+    </div>
 
     <!-- Student List Form -->
     <form id="attendanceForm" class="student-list"></form>

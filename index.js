@@ -54,7 +54,7 @@ app.post('/login', async (req, res) => {
             res.cookie('subject', teacher[0].subject);
             res.redirect('/dashboard');
         } else {
-            res.json("Wrong credentials");
+            res.redirect('/');
         }
     }
     catch(err) {

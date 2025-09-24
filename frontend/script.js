@@ -3,6 +3,7 @@ const server = 'http://localhost:3000';
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('lowAttendanceList').style.display = "none";
     document.getElementById('attendanceData').style.display = "none";
+    document.getElementById('studentAttedanceData').style.display = "none";
     setTimeout(() => {
         showNotification(`Your Id is ${getCookie('id')}`);
     }, 1000);
@@ -55,6 +56,7 @@ function getLowAttendanceStudents() {
   document.getElementById('lowAttendanceList').style.display = "block";
   document.getElementById('attendanceForm').style.display = "none";
   document.getElementById('attendanceData').style.display = "none";
+  document.getElementById('studentAttedanceData').style.display = "none";
   fetch(server + '/attendance/less') 
     .then(response => response.json())
     .then(data => {
@@ -108,6 +110,7 @@ async function markAttendance() {
   document.getElementById('attendanceForm').style.display = "block";
   document.getElementById('lowAttendanceList').style.display = "none";
   document.getElementById('attendanceData').style.display = "none";
+  document.getElementById('studentAttedanceData').style.display = "none";
   let link = server + '/student';
   const response = await fetch(link);
   const students = await response.json();
@@ -251,6 +254,7 @@ document.getElementById('attendanceForm').addEventListener('submit', async (e) =
 async function getAttendanceData() {
   document.getElementById('lowAttendanceList').style.display = "none";
   document.getElementById('attendanceForm').style.display = "none";
+  document.getElementById('studentAttedanceData').style.display = "none";
   const attendanceData = document.getElementById('attendanceData');
   attendanceData.innerHTML = '';
   attendanceData.style.display = "block";
@@ -306,7 +310,63 @@ async function getAttendanceData() {
 
     attendanceData.appendChild(row);
   });
+}
 
+document.getElementById('student-attendance-btn').addEventListener('click', () => {
+    document.getElementById('studentAttedanceData').style.display = "block";
+    document.getElementById('attendanceData').style.display = "none";
+    document.getElementById('lowAttendanceList').style.display = "none";
+    document.getElementById('attendanceForm').style.display = "none";
+});
+
+async function getStudentAttendance() {
+    document.getElementById('data').innerHTML = '';
+    const id = document.getElementById('id').value;
+    if(!id || id === '') {
+        showNotification('Enter valid Id');
+        return;
+    }
+    let response = await fetch(`${server}/student/${id}`);
+    response = await response.json();
+    const data_container = document.getElementById('studentAttedanceData');
+    const data = document.getElementById('data');
+    if(response === 'Id not found') {
+        showNotification(response);
+        return;
+    }
+    let html = `
+        <table class="info">
+            <tr>
+                <th>Id</td>
+                <th>Name</td>
+                <th>Attendance</th>
+            </tr>
+            <tr>
+                <td>${id}</td>
+                <td>${response.student.first_name} ${response.student.last_name}</td>
+                <td>${response.attendance}</td>
+            </tr>
+        </table>
+        `;
+    if(response.presentDates.length) { 
+        html += `<table class="present-dates">
+            <tr><th>Present Dates</th></tr>`
+        response.presentDates.forEach(date => {
+            html += `<tr><td>${date}</td></tr>`;
+        });
+        html += `</table>`;
+    }
+    if(response.absentDates.length){
+        html += `</h2><table class="absent-dates">
+            <tr><th>Absent Dates</th></tr>`
+        response.absentDates.forEach(date => {
+            html += `<tr><td>${date}</td></tr>`;
+        });
+        html += `</table>`;
+    }
+
+    data.innerHTML = html;
+    data_container.appendChild(data);
 }
 
 // --- Add Student ---
