@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS students (
 -- Topics Table (Composite PK: teacher_id + date)
 CREATE TABLE IF NOT EXISTS topics (
     teacher_id INT NOT NULL,
-    `date` DATE NOT NULL DEFAULT (CURDATE()),
+    topic_date DATE NOT NULL DEFAULT (CURDATE()),
     topic VARCHAR(255) NOT NULL,
     PRIMARY KEY (teacher_id, `date`),
     FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE CASCADE
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS topics (
 CREATE TABLE IF NOT EXISTS attendance (
     teacher_id INT NOT NULL,
     student_id INT NOT NULL,
-    `date` DATE NOT NULL,
+    attendance_date DATE NOT NULL,
     status ENUM('Present', 'Absent') NOT NULL DEFAULT 'Present',
     PRIMARY KEY (teacher_id, student_id, `date`),
     FOREIGN KEY (teacher_id, student_id) 
