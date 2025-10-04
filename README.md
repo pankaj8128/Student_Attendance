@@ -10,6 +10,12 @@ This project is a web application for teachers to manage and mark student attend
 
 Below are some screenshots from the application to give you an idea of its interface and features.
 
+### Sign-Up page
+
+![Sign Up](images/sign-up.png)
+
+*Create account with your subject and password.*
+
 ### Mark Attendance
 
 ![Mark Attendance](images/mark-attendance.png)
