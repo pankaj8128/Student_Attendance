@@ -1,9 +1,28 @@
 # Note
 
 This project was created as a learning exercise while exploring and practicing Express.js.
+
 # Student Attendance Management System
 
 This project is a web application for teachers to manage and mark student attendance. It uses Node.js, Express.js, MariaDB, and EJS for server-side rendering. The backend is the main focus, with a simple frontend for interaction.
+
+## Screenshots
+
+Below are some screenshots from the application to give you an idea of its interface and features.
+
+### Mark Attendance
+
+![Mark Attendance](images/mark-attendance.png)
+
+*Easily mark attendance for each student by date and topic.*
+
+### Attendance Report
+
+![Attendance Report](images/attendance-report.png)
+
+*View attendance statistics and identify students with attendance below 75%.*
+
+---
 
 ## Features
 
@@ -20,9 +39,9 @@ This project is a web application for teachers to manage and mark student attend
 
 - **Routing:** Modular route handling using Express Router (`routes/student.js`, `routes/attendance.js`)
 - **Middleware:**
-	- Built-in middleware: `express.json()`, `express.urlencoded()`
-	- Third-party: `cookie-parser` for cookie handling
-	- Custom: Authentication middleware (`middlewares/auth.js`)
+    - Built-in middleware: `express.json()`, `express.urlencoded()`
+    - Third-party: `cookie-parser` for cookie handling
+    - Custom: Authentication middleware (`middlewares/auth.js`)
 - **View Engine:** EJS for rendering error and profile pages
 - **Static File Serving:** Serving frontend assets (HTML, CSS, JS)
 - **Error Handling:** Centralized error rendering
