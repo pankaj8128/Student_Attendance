@@ -1,12 +1,13 @@
 const server = 'http://localhost:3000';
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('lowAttendanceList').style.display = "none";
-    document.getElementById('attendanceData').style.display = "none";
-    document.getElementById('studentAttedanceData').style.display = "none";
-    setTimeout(() => {
-        showNotification(`Your Id is ${getCookie('id')}`);
-    }, 1000);
+  document.getElementById('lowAttendanceList').style.display = "none";
+  document.getElementById('attendanceData').style.display = "none";
+  document.getElementById('studentAttedanceData').style.display = "none";
+  markAttendance();
+  setTimeout(() => {
+    showNotification(`Your Id is ${getCookie('id')}`);
+  }, 1000);
 });
 
 // --- Set Date Input ---
@@ -17,39 +18,26 @@ document.querySelector('.date').max = new Date().toISOString().split('T')[0];
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) 
-    return parts.pop().split(';').shift().split('%20').join(' ');
+  return parts.pop().split(';').shift().split('%20').join(' ');
 }
-
-// --- Teacher Name Button, subject ---
-const id = getCookie('id');
-const teacherFirstName = getCookie('first_name');
-const teacherLastName = getCookie('last_name');
-const subject = getCookie('subject');
-document.getElementById('teacherBtn').textContent =
-    id && teacherFirstName && teacherLastName ? `${teacherFirstName} ${teacherLastName} (${id})` : 'Teacher';
-document.getElementById('subjectBtn').textContent = 
-    id && teacherFirstName && teacherLastName ? `${subject}`: 'Subject';
 
 // --- Logout Function ---
 function logout() {
   document.cookie = "id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  document.cookie = "first_name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  document.cookie = "last_name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  document.cookie = "subject=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  fetch(server + '/logout', { method: "POST", credentials: "include" });
   window.location.href = '/';
 }
 
 function showNotification(message) {
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = message;
-    document.body.appendChild(notification);
+  const notification = document.createElement('div');
+  notification.className = 'notification';
+  notification.textContent = message;
+  document.body.appendChild(notification);
 
-    setTimeout(() => {
-        if(document.body.contains(notification))
-            document.body.removeChild(notification);
-    }, 2000);
+  setTimeout(() => {
+    if (document.body.contains(notification))
+      document.body.removeChild(notification);
+  }, 2000);
 }
 
 function getLowAttendanceStudents() {
@@ -57,7 +45,7 @@ function getLowAttendanceStudents() {
   document.getElementById('attendanceForm').style.display = "none";
   document.getElementById('attendanceData').style.display = "none";
   document.getElementById('studentAttedanceData').style.display = "none";
-  fetch(server + '/attendance/less') 
+  fetch(server + '/attendance/less', { credentials: "include" })
     .then(response => response.json())
     .then(data => {
       const container = document.getElementById('lowAttendanceList');
@@ -102,7 +90,7 @@ function getLowAttendanceStudents() {
       document.getElementById('lowAttendanceList').innerHTML =
         '<p>Error fetching data. Please try again later.</p>';
     });
-    document.getElementById('lowAttendanceList').style.display = "block";
+  document.getElementById('lowAttendanceList').style.display = "block";
 }
 
 // --- Students & Attendance Form ---
@@ -112,13 +100,13 @@ async function markAttendance() {
   document.getElementById('attendanceData').style.display = "none";
   document.getElementById('studentAttedanceData').style.display = "none";
   let link = server + '/student';
-  const response = await fetch(link);
+  const response = await fetch(link, { credentials: "include" });
   const students = await response.json();
 
   const form = document.getElementById('attendanceForm');
   form.innerHTML = '';
 
-  if(!students.length) {
+  if (!students.length) {
     let div = document.createElement('div');
     div.innerHTML = 'Add students to mark attendance.';
     div.setAttribute('class', 'no-students');
@@ -141,8 +129,8 @@ async function markAttendance() {
   topicInput.id = 'topic';
   topicInput.name = 'topic';
   topicInput.placeholder = 'Enter topic';
-  topicInput.style.backgroundColor = '#2c2c2c';
-  topicInput.style.color = '#f5f5f5';
+  topicInput.style.backgroundColor = 'rgb(227 216 216)';
+  topicInput.style.color = 'rgb(48 36 36)';
   topicInput.style.padding = '8px';
   topicInput.style.borderRadius = '4px';
   topicInput.style.border = 'none';
@@ -238,7 +226,8 @@ document.getElementById('attendanceForm').addEventListener('submit', async (e) =
   const response = await fetch(server + '/attendance', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
+    credentials: "include"
   });
 
   if (response.ok) {
@@ -261,7 +250,7 @@ async function getAttendanceData() {
   let data = await fetch(`${server}/attendance/${document.getElementById('date').value}`);
   data = await data.json();
 
-  if(!data.students.length) {
+  if (!data.students.length) {
     let div = document.createElement('div');
     div.innerHTML = 'No data available';
     div.setAttribute('class', 'attendance-data');
@@ -273,11 +262,11 @@ async function getAttendanceData() {
   let topic = document.createElement('div');
   topic.style.marginBottom = '15px';
   topic.style.textAlign = 'center';
-  topic.id = 'topic';
+  topic.id = 'topic-container';
 
   let topicInput = document.createElement('input');
   topicInput.type = 'text';
-  topicInput.id = 'topic';
+  topicInput.id = 'topic-display';
   topicInput.name = 'topic';
   topicInput.value = data.topic;
   topicInput.style.backgroundColor = '#2c2c2c';
@@ -313,28 +302,28 @@ async function getAttendanceData() {
 }
 
 document.getElementById('student-attendance-btn').addEventListener('click', () => {
-    document.getElementById('studentAttedanceData').style.display = "block";
-    document.getElementById('attendanceData').style.display = "none";
-    document.getElementById('lowAttendanceList').style.display = "none";
-    document.getElementById('attendanceForm').style.display = "none";
+  document.getElementById('studentAttedanceData').style.display = "block";
+  document.getElementById('attendanceData').style.display = "none";
+  document.getElementById('lowAttendanceList').style.display = "none";
+  document.getElementById('attendanceForm').style.display = "none";
 });
 
 async function getStudentAttendance() {
-    document.getElementById('data').innerHTML = '';
-    const id = document.getElementById('id').value;
-    if(!id || id === '') {
-        showNotification('Enter valid Id');
-        return;
-    }
-    let response = await fetch(`${server}/student/${id}`);
-    response = await response.json();
-    const data_container = document.getElementById('studentAttedanceData');
-    const data = document.getElementById('data');
-    if(response === 'Id not found') {
-        showNotification(response);
-        return;
-    }
-    let html = `
+  document.getElementById('data').innerHTML = '';
+  const id = document.getElementById('id').value;
+  if (!id || id === '') {
+    showNotification('Enter valid Id');
+    return;
+  }
+  let response = await fetch(`${server}/student/${id}`, { credentials: "include" });
+  response = await response.json();
+  const data_container = document.getElementById('studentAttedanceData');
+  const data = document.getElementById('data');
+  if (response === 'Id not found') {
+    showNotification(response);
+    return;
+  }
+  let html = `
         <table class="info">
             <tr>
                 <th>Id</td>
@@ -348,25 +337,25 @@ async function getStudentAttendance() {
             </tr>
         </table>
         `;
-    if(response.presentDates.length) { 
-        html += `<table class="present-dates">
+  if (response.presentDates.length) {
+    html += `<table class="present-dates">
             <tr><th>Present Dates</th></tr>`
-        response.presentDates.forEach(date => {
-            html += `<tr><td>${date}</td></tr>`;
-        });
-        html += `</table>`;
-    }
-    if(response.absentDates.length){
-        html += `</h2><table class="absent-dates">
+    response.presentDates.forEach(date => {
+      html += `<tr><td>${date}</td></tr>`;
+    });
+    html += `</table>`;
+  }
+  if (response.absentDates.length) {
+    html += `</h2><table class="absent-dates">
             <tr><th>Absent Dates</th></tr>`
-        response.absentDates.forEach(date => {
-            html += `<tr><td>${date}</td></tr>`;
-        });
-        html += `</table>`;
-    }
+    response.absentDates.forEach(date => {
+      html += `<tr><td>${date}</td></tr>`;
+    });
+    html += `</table>`;
+  }
 
-    data.innerHTML = html;
-    data_container.appendChild(data);
+  data.innerHTML = html;
+  data_container.appendChild(data);
 }
 
 // --- Add Student ---
@@ -386,7 +375,8 @@ addStudentForm.addEventListener('submit', async (e) => {
   const response = await fetch(server + '/student', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id, first_name, last_name })
+    body: JSON.stringify({ id, first_name, last_name }),
+    credentials: 'include'
   });
 
   if (response.ok) {
@@ -415,7 +405,8 @@ updateStudentForm.addEventListener('submit', async (e) => {
   const response = await fetch(server + '/student', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id, first_name, last_name })
+    body: JSON.stringify({ id, first_name, last_name }),
+    credentials: 'include'
   });
 
   if (response.ok) {
@@ -439,7 +430,8 @@ deleteStudentForm.addEventListener('submit', async (e) => {
   }
 
   const response = await fetch(server + '/student/' + id, {
-    method: 'DELETE'
+    method: 'DELETE',
+    credentials: 'include'
   });
 
   if (response.ok) {

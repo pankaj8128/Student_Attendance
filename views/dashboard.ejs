@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Database</title>
+  <title>Dashboard Rendered</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <!-- LEFT SIDE -->
   <div class="left-section">
     <button class="logout-btn" onclick="logout()">Logout</button>
-    <button class="teacher" id="teacherBtn"></button>
-    <button class="subject" id="subjectBtn"></button>
+    <button class="teacher" id="teacherBtn"><%=teacherData%></button>
+    <button class="subject" id="subjectBtn"><%=subject%></button>
     <input type="date" id="date" class="date">
     <button onclick="markAttendance()">Mark Attendance</button>
     <button onclick="getLowAttendanceStudents()">Below 75% Attendance</button>
