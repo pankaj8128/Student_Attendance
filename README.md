@@ -1,6 +1,6 @@
 # Note
 
-This project was created as a learning exercise while exploring and practicing Express.js.
+This project was created while learning and practicing Express.js.
 
 # Student Attendance Management System
 
