@@ -4,42 +4,23 @@ This project was created while learning and practicing Express.js.
 
 # Student Attendance Management System
 
-This project is a web application for teachers to manage and mark student attendance. It uses Node.js, Express.js, MariaDB, and EJS for server-side rendering. The backend is the main focus, with a simple frontend for interaction.
+This project is a web application for teachers to manage and mark student attendance. It uses Node.js, Express.js, PostgreSQL, and EJS for server-side rendering. The backend is the main focus, with a simple frontend for interaction.
 
-## Screenshots
 
-Below are some screenshots from the application to give you an idea of its interface and features.
-
-### Sign-Up page
-
-![Sign Up](images/sign-up.png)
-
-*Create account with your subject and password.*
-
-### Mark Attendance
-
-![Mark Attendance](images/mark-attendance.png)
-
-*Easily mark attendance for each student by date and topic.*
-
-### Attendance Report
-
-![Attendance Report](images/attendance-report.png)
-
-*View attendance statistics and identify students with attendance below 75%.*
 
 ---
 
 ## Features
 
 - Teacher authentication (signup/login) with password hashing (bcrypt)
-- Student management (add/view students)
-- Mark and view attendance by date
+- Class and Subject management per teacher
+- Student enrollment into specific classes
+- Mark and view attendance by date for a given class
 - View students with attendance below 75%
 - View individual student attendance details
 - Topic tracking for each class date
-- Secure routes using authentication middleware
-- EJS templating for error and profile views
+- Secure routes using authentication middleware and HTTP-only cookies
+- EJS templating for dashboard views
 
 ## Express.js Features Used
 
@@ -67,30 +48,30 @@ cd student_attendance
 npm install
 ```
 
-### 3. Install MariaDB
+### 3. Install PostgreSQL
 
 #### Ubuntu (Linux)
 
 ```sh
 sudo apt update
-sudo apt install mariadb-server
-sudo systemctl start mariadb
-sudo systemctl enable mariadb
+sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
 ```
 
 #### Windows
 
-- Download the MariaDB installer from: https://mariadb.org/download/
+- Download the PostgreSQL installer from: https://www.postgresql.org/download/windows/
 - Run the installer and follow the setup instructions
-- Start the MariaDB service from the Services app or using the command prompt
+- Start the PostgreSQL service from the Services app
 
 ### 4. Database Setup
 
-1. Open MariaDB client (e.g., `mysql -u root -p`)
+1. Open PostgreSQL client (e.g., `psql -U postgres`)
 2. Run the SQL script in `db-init/schema.sql` to create the required database and tables:
 
 ```sql
-source db-init/schema.sql;
+\i db-init/schema.sql
 ```
 
 ### 5. Environment Variables
@@ -98,11 +79,8 @@ source db-init/schema.sql;
 Create a `.env` file in the project root with the following content (edit as needed):
 
 ```
-host=localhost
-user=<your_db_user>
-password=<your_db_password>
-database=attendance_system
-db_port=3306
+DATABASE_URL=postgres://<user>:<password>@<host>:<port>/<database>
+SECRET_KEY=<your_secret_key>
 port=3000
 ```
 
