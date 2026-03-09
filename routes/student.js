@@ -1,111 +1,211 @@
-const express = require('express');
-const pool = require('../db');
-const { auth } = require('../middlewares/auth');
+const express = require("express");
+const pool = require("../db");
+const { auth } = require("../middlewares/auth");
 const router = express.Router();
 router.use(express.json());
 router.use(auth);
 
-router.get('/', async (req, res) => {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        const rows = await conn.query('SELECT student_id, first_name, last_name FROM students WHERE teacher_id = ?', [req.payload.id]);
-        res.status(200).json(rows);
-    }
-    catch (err) {
-        console.log('Error: ', err);
-        res.status(500).send('Database Error');
-    }
-    finally {
-        if(conn)
-            conn.release();
-    }
+router.get("/", async (req, res) => {
+  const subject = req.query.subject;
+  if (!subject) res.status(422).json({ message: "Subject not provided" });
+  let conn;
+  try {
+    conn = await pool.connect();
+    const rows = await conn.query(
+      `
+            SELECT s.student_id, s.first_name, s.last_name
+            FROM students s
+            JOIN enrollments e ON s.student_id = e.student_id
+            JOIN classes c ON e.class_id = c.class_id
+            JOIN subjects sub ON c.subject_id = sub.subject_id
+            WHERE c.teacher_id = $1 AND sub.subject_name = $2
+            ORDER BY s.student_id ASC
+        `,
+      [req.payload.id, subject],
+    );
+    res.status(200).json(rows.rows);
+  } catch (err) {
+    console.log("Error: ", err);
+    res.status(500).send("Database Error");
+  } finally {
+    if (conn) conn.release();
+  }
 });
 
-router.get('/:id', async (req, res) => {
-    const id = req.params.id; 
-    if (!id)
-        res.status(422).send('Invalid ID');
-    let conn;
-    try{
-        conn = await pool.getConnection();
-        const student = await conn.query('SELECT student_id, first_name, last_name FROM students WHERE teacher_id = ? AND student_id = ?', [req.payload.id, id]);
-        if(!student.length)
-            return res.json('Id not found');  
-        const attendance = await conn.query("SELECT ((SELECT COUNT(*) FROM attendance WHERE teacher_id = ? AND student_id = ? AND status = 'Present') / (SELECT COUNT(*) FROM attendance WHERE teacher_id = ? AND student_id = ?)) * 100 as total_attendance", [req.payload.id, id, req.payload.id, id]);
-        let presentDates = await conn.query("SELECT attendance_date FROM attendance WHERE teacher_id = ? AND student_id = ? AND status = 'Present'", [req.payload.id, id]);
-        let absentDates = await conn.query("SELECT attendance_date FROM attendance WHERE teacher_id = ? AND student_id = ? AND status = 'Absent'", [req.payload.id, id]);
-        for(let i = 0; i < presentDates.length; i++)
-            presentDates[i] = presentDates[i].attendance_date;
-        for(let i = 0; i < absentDates.length; i++)
-            absentDates[i] = absentDates[i].attendance_date;
-        res.status(200).json({student: student[0], attendance: Math.ceil(attendance[0].total_attendance), presentDates, absentDates});
-    }  
-    catch (err) {
-        res.status(500).send('Database Error');
+router.get("/:id", async (req, res) => {
+  const subjects = JSON.parse(req.cookies.subjects);
+  const subject = req.query.subject;
+  let class_id;
+  for (let sub of subjects) {
+    if (sub.subject_name === subject) {
+      class_id = sub.class_id;
+      break;
     }
-    finally {
-        if(conn)
-            conn.release();
-    }   
+  }
+  const id = req.params.id;
+  if (!id) res.status(422).send("Invalid ID");
+  let conn;
+  try {
+    conn = await pool.connect();
+    const student = await conn.query(
+      `
+            SELECT s.student_id, s.first_name, s.last_name
+            FROM students s
+            JOIN enrollments e ON s.student_id = e.student_id
+            JOIN classes c ON e.class_id = c.class_id
+            JOIN subjects sub ON c.subject_id = sub.subject_id
+            WHERE c.teacher_id = $1 AND sub.subject_name = $2 AND s.student_id = $3
+        `,
+      [class_id, subject, id],
+    );
+
+    const result = await conn.query(
+      `
+            SELECT 
+                json_agg(attendance_date ORDER BY attendance_date ASC) FILTER (WHERE status = 'Present') AS present,
+                json_agg(attendance_date ORDER BY attendance_date ASC) FILTER (WHERE status != 'Present') AS absent
+                FROM attendance
+                WHERE class_id = $1 AND student_id = $2
+            `,
+      [class_id, id],
+    );
+    const { present, absent } = result.rows[0] || { present: [], absent: [] };
+    const presentDates = present || [];
+    const absentDates = absent || [];
+    res.status(200).json({
+      student: student.rows[0],
+      attendance: Math.ceil(
+        (presentDates.length / (presentDates.length + absentDates.length)) *
+          100,
+      ),
+      presentDates: presentDates,
+      absentDates: absentDates,
+    });
+  } catch (err) {
+    console.log("Error fetching student: ", err);
+    if (err.code === "22012")
+      // division by zero
+      return res.status(422).json({ message: "No classes are conducted" });
+    res.status(500).send("Database Error");
+  } finally {
+    if (conn) conn.release();
+  }
 });
 
-
-router.post('/', async (req, res) => {
-    const {id, first_name, last_name} = req.body;
-    if (!id || !first_name || !last_name)
-        res.status(422).send('Invalid Data');
-    let conn;
-    try{
-        conn = await pool.getConnection();
-        const rows = await conn.query('INSERT INTO students values (?, ?, ?, ?)', [req.payload.id, id, first_name, last_name]);
-        rows? res.status(201).send('Student inserted'):res.status(500).send('Insertion failed');
-    } 
-    catch (err) {
-        res.status(500).send('Database Error');
+router.post("/", async (req, res) => {
+  const { first_name, last_name } = req.body;
+  if (!first_name || !last_name) res.status(422).send("Invalid Data");
+  const subjects = JSON.parse(req.cookies.subjects);
+  const subject = req.query.subject;
+  let class_id;
+  for (let sub of subjects) {
+    if (sub.subject_name === subject) {
+      class_id = sub.class_id;
+      break;
     }
-    finally {
-        if(conn)
-            conn.release();
+  }
+  let conn;
+  try {
+    conn = await pool.connect();
+    let rows = await conn.query(
+      `
+            SELECT * FROM students
+            WHERE first_name = $1 and last_name = $2
+            `,
+      [first_name, last_name],
+    );
+    console.log(rows);
+    if (!rows.rows.length) {
+      rows = await conn.query(
+        `
+                INSERT INTO students (first_name, last_name)
+                VALUES ($1, $2)
+                RETURNING student_id;
+            `,
+        [first_name, last_name],
+      );
     }
+    const student_id = rows.rows[0].student_id;
+    rows = await conn.query(
+      `
+            INSERT INTO enrollments (student_id, class_id)
+            VALUES ($1, $2)
+            `,
+      [student_id, class_id],
+    );
+    res.status(201).json({ message: "Student enrolled successfully" });
+  } catch (err) {
+    console.log("Error Adding Student: ", err);
+    if (err.code === "23505")
+      return res.status(409).json({ message: "Student already enrolled" });
+    res.status(500).json("Error Adding Student");
+  } finally {
+    if (conn) conn.release();
+  }
 });
 
-router.put('/', async (req, res) => {
-    const {id, first_name, last_name} = req.body;
-    if (!id || !first_name || !last_name)
-        res.status(422).send('Invalid Data');
-    let conn;
-    try{
-        conn = await pool.getConnection();
-        const rows = await conn.query('UPDATE students SET first_name = ?, last_name = ? WHERE teacher_id = ? AND student_id = ?', [first_name, last_name, req.payload.id, id]);
-        rows? res.status(201).send('Student updated'):res.status(500).send('Updation failed');
-    }
-    catch (err) {
-        res.status(500).send('Database Error');
-    }
-    finally {
-        if(conn)
-            conn.release();
-    }
+router.put("/", async (req, res) => {
+  const { id, first_name, last_name } = req.body;
+  if (!id || !first_name || !last_name) res.status(422).send("Invalid Data");
+  let conn;
+  try {
+    conn = await pool.connect();
+    let rows = await conn.query(
+      `
+            UPDATE students
+            SET first_name = $1, last_name = $2
+            WHERE student_id = $3;
+            `,
+      [first_name, last_name, id],
+    );
+    if (rows) res.status(201).json({ message: "Student updated" });
+    else res.status(500).json({ message: "Updation failed" });
+  } catch (err) {
+    console.log("Error Updating Student: ", err);
+    res.status(500).json({ message: "Database Error" });
+  } finally {
+    if (conn) conn.release();
+  }
 });
 
-router.delete('/:id', async (req, res) => {
-    const id = req.params.id;
-    if (!id)
-        res.status(422).send('Id not provided');
-    let conn;
-    try{
-        conn = await pool.getConnection();
-        const rows = await conn.query('DELETE FROM students WHERE teacher_id = ? AND student_id = ?', [req.payload.id, id]);
-        rows? res.status(204).send('Student deleted'):res.status(500).send('Deletion failed');
+router.delete("/:id", async (req, res) => {
+  const id = req.params.id;
+  if (!id) res.status(422).send("Id not provided");
+  const subjects = JSON.parse(req.cookies.subjects);
+  const subject = req.query.subject;
+  let class_id;
+  for (let sub of subjects) {
+    if (sub.subject_name === subject) {
+      class_id = sub.class_id;
+      break;
     }
-    catch (err) {
-        res.status(500).send('Database Error');
-    }
-    finally {
-        if(conn)
-            conn.release();
-    }
+  }
+  let conn;
+  try {
+    conn = await pool.connect();
+    const delEnr = await conn.query(
+      `
+            DELETE FROM enrollments
+            WHERE class_id = $1 AND student_id = $2
+        `,
+      [class_id, id],
+    );
+    const delAtt = await conn.query(
+      `
+            DELETE FROM attendance
+            WHERE class_id = $1 AND student_id = $2
+        `,
+      [class_id, id],
+    );
+    if (delEnr && delAtt)
+      res.status(204).json({ message: "Student deleted successfully!" });
+    else res.json({ message: "Failed to delete student" });
+  } catch (err) {
+    console.log("Error: ", err);
+    res.status(500).send("Failed to delete student");
+  } finally {
+    if (conn) conn.release();
+  }
 });
 
 module.exports = router;

@@ -1,44 +1,64 @@
--- Database
-CREATE DATABASE IF NOT EXISTS attendance_system;
-USE attendance_system;
+-- 1. Handle the Enum for Attendance Status
+CREATE TYPE attendance_status AS ENUM ('Present', 'Absent');
 
--- Teachers Table
-CREATE TABLE IF NOT EXISTS teachers (
-    teacher_id INT AUTO_INCREMENT PRIMARY KEY,
+-- 2. Teachers Table
+CREATE TABLE teachers (
+    teacher_id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
-    subject varchar(100) NOT NULL,
     password VARCHAR(255) NOT NULL
 );
 
--- Students Table (Composite PK: teacher_id + student_id)
-CREATE TABLE IF NOT EXISTS students (
-    teacher_id INT NOT NULL,
-    student_id INT NOT NULL,
+-- 3. Students Table
+CREATE TABLE students (
+    student_id SERIAL PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL,
-    last_name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (teacher_id, student_id),
-    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE CASCADE
+    last_name VARCHAR(255) NOT NULL
 );
 
--- Topics Table (Composite PK: teacher_id + date)
-CREATE TABLE IF NOT EXISTS topics (
-    teacher_id INT NOT NULL,
-    topic_date DATE NOT NULL DEFAULT (CURDATE()),
-    topic VARCHAR(255) NOT NULL,
-    PRIMARY KEY (teacher_id, `date`),
-    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE CASCADE
+-- 4. Subjects Table
+CREATE TABLE subjects (
+    subject_id SERIAL PRIMARY KEY,
+    subject_name VARCHAR(100) NOT NULL
 );
 
--- Attendance Table (Composite PK: teacher_id + student_id + date)
-CREATE TABLE IF NOT EXISTS attendance (
-    teacher_id INT NOT NULL,
-    student_id INT NOT NULL,
+-- 5. Classes Table
+CREATE TABLE classes (
+    class_id SERIAL PRIMARY KEY,
+    teacher_id INT,
+    subject_id INT,
+    semester VARCHAR(20),
+    CONSTRAINT fk_teacher FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE CASCADE,
+    CONSTRAINT fk_subject FOREIGN KEY (subject_id) REFERENCES subjects(subject_id)
+);
+
+-- 6. Enrollments Table
+CREATE TABLE enrollments (
+    class_id INT,
+    student_id INT,
+    PRIMARY KEY (class_id, student_id),
+    CONSTRAINT fk_class FOREIGN KEY (class_id) REFERENCES classes(class_id) ON DELETE CASCADE,
+    CONSTRAINT fk_student FOREIGN KEY (student_id) REFERENCES students(student_id)
+);
+
+-- 7. Topics Table
+CREATE TABLE topics (
+    topic_id SERIAL PRIMARY KEY,
+    class_id INT,
+    topic_date DATE DEFAULT CURRENT_DATE,
+    topic_description TEXT,
+    CONSTRAINT fk_class_topic FOREIGN KEY (class_id) REFERENCES classes(class_id) ON DELETE CASCADE,
+    UNIQUE (class_id, topic_date)
+);
+
+-- 8. Attendance Table
+CREATE TABLE attendance (
+    attendance_id SERIAL PRIMARY KEY,
+    class_id INT,
+    student_id INT,
     attendance_date DATE NOT NULL,
-    status ENUM('Present', 'Absent') NOT NULL DEFAULT 'Present',
-    PRIMARY KEY (teacher_id, student_id, `date`),
-    FOREIGN KEY (teacher_id, student_id) 
-        REFERENCES students(teacher_id, student_id) 
-        ON DELETE CASCADE,
-    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE CASCADE
+    status attendance_status DEFAULT 'Present',
+    CONSTRAINT fk_enrollment FOREIGN KEY (class_id, student_id) REFERENCES enrollments(class_id, student_id) ON DELETE CASCADE,
+    UNIQUE (class_id, student_id, attendance_date)
 );
