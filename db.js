@@ -1,15 +1,11 @@
-const mariadb = require('mariadb');
-require('dotenv').config()
+require("dotenv").config();
+const { Pool } = require("pg");
 
-const pool = mariadb.createPool({
-    host: process.env.host, 
-    user: process.env.user, 
-    password: process.env.password,
-    database: process.env.database,
-    port: process.env.db_port,
-    dateStrings: true,
-    connectionLimit: 10
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    require: true,
+  },
 });
 
 module.exports = pool;
-

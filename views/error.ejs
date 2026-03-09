@@ -1,12 +1,84 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error</title>
+    <title>Error Rendered</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0f0f0f, #1c1c1c);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ffffff;
+        }
+
+        .error-container {
+            text-align: center;
+            padding: 40px 50px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #ff4d4d;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: #dddddd;
+            word-break: break-word;
+        }
+
+        .error-code {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #ff4d4d;
+        }
+
+        .btn-home {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 10px 20px;
+            background: #ff4d4d;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-home:hover {
+            background: #ff1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
+        }
+    </style>
 </head>
-<body style="background-color: black; color: white">
-    <h1>Error Occurred</h1>
-    <h2> <%=err%> </h2>
+
+<body>
+    <div class="error-container">
+        <div class="error-code">⚠</div>
+        <h1>Error Occurred</h1>
+        <h2>
+            <%= err %>
+        </h2>
+        <a href="/" class="btn-home">Go Back Home</a>
+    </div>
 </body>
-</html>

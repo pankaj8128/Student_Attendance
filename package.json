@@ -11,6 +11,7 @@
     "Attendance"
   ],
   "author": "Pankaj Jagadale",
+  "type": "commonjs",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -19,10 +20,8 @@
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.3",
-    "live-server": "^1.2.0",
-    "mariadb": "^3.4.5",
-    "multer": "^2.0.2",
     "nodemon": "^3.1.10",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "pg": "^8.19.0"
   }
 }
