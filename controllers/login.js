@@ -4,10 +4,6 @@ const pool = require("../db");
 
 module.exports = async (req, res) => {
   const { username, password } = req.body;
-  if (!username || !password)
-    return res
-      .status(201)
-      .json({ message: "Please provide username and password" });
   let conn;
   try {
     conn = await pool.connect();

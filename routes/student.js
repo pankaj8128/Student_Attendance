@@ -1,6 +1,12 @@
 const express = require("express");
 const pool = require("../db");
 const { auth } = require("../middlewares/auth");
+const validator = require("../middlewares/validate");
+const {
+  add: addvalidator,
+  update: updatevalidator,
+} = require("../validators/student");
+
 const router = express.Router();
 router.use(express.json());
 router.use(auth);
@@ -92,9 +98,8 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", validator(addvalidator), async (req, res) => {
   const { first_name, last_name } = req.body;
-  if (!first_name || !last_name) res.status(422).send("Invalid Data");
   const subjects = JSON.parse(req.cookies.subjects);
   const subject = req.query.subject;
   let class_id;
@@ -144,9 +149,8 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/", async (req, res) => {
+router.put("/", validator(updatevalidator), async (req, res) => {
   const { id, first_name, last_name } = req.body;
-  if (!id || !first_name || !last_name) res.status(422).send("Invalid Data");
   let conn;
   try {
     conn = await pool.connect();

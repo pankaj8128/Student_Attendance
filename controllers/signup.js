@@ -4,8 +4,6 @@ const pool = require("../db");
 
 module.exports = async (req, res) => {
   let { username, first_name, last_name, password } = req.body;
-  if (!username || !first_name || !last_name || !password)
-    return res.status(201).json({ message: "Please provide valid data" });
   password = await bcrypt.hash(password, 10);
   let conn;
   try {

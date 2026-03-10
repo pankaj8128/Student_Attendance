@@ -20,6 +20,9 @@ app.use("/student", student_route);
 app.use("/attendance", attendance_route);
 app.use("/teacher", teacher_route);
 
+const loginvalidator = require("./validators/login");
+const signupvalidator = require("./validators/signup");
+const validate = require("./middlewares/validate");
 const { auth } = require("./middlewares/auth");
 const login = require("./controllers/login");
 const signup = require("./controllers/signup");
@@ -35,8 +38,8 @@ app.get("/", auth, (req, res) => {
 });
 
 app.get("/dashboard", auth, dashboard);
-app.post("/login", login);
-app.post("/signup", signup);
+app.post("/login", validate(loginvalidator), login);
+app.post("/signup", validate(signupvalidator), signup);
 app.post("/logout", logout);
 
 app.listen(port, () => {
